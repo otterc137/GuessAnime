@@ -226,6 +226,79 @@ const CSS = `
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes sheen{0%,100%{background-position:100% 100%}50%{background-position:0% 0%}}
 @keyframes btnShine{0%,100%{left:-100%}40%{left:120%}41%{left:-100%}}
+
+.btn-giveup{display:flex;align-items:center;gap:6px;padding:10px 18px;font-size:13px;color:var(--t2);background:var(--s2);border:1px solid var(--b);border-radius:12px;cursor:pointer;transition:all 0.2s;font-family:'Outfit',sans-serif;font-weight:700}
+.btn-giveup:hover{color:var(--r);background:var(--rg);border-color:rgba(251,113,133,0.2)}
+.btn-giveup:active{transform:scale(0.95)}
+.btn-giveup svg{width:16px;height:16px;flex-shrink:0}
+
+@media(max-width:640px){
+  .S{padding:14px 10px}
+  .P{padding:8px 8px 16px}
+  .s-icon{width:60px;height:60px;border-radius:18px;font-size:30px;margin-bottom:12px}
+  .s-t{font-size:24px}
+  .s-sub{font-size:13px;max-width:260px;margin-bottom:12px}
+  .s-stats{gap:4px;margin-bottom:18px}
+  .s-stat{padding:8px 12px;border-radius:12px}
+  .s-stat-v{font-size:17px}
+  .s-stat-l{font-size:9px}
+  .s-rules{gap:5px;max-width:100%;margin-bottom:20px}
+  .s-rule{padding:7px 12px;font-size:12px;gap:8px}
+  .btn-go{padding:14px 44px;font-size:15px;border-radius:12px}
+
+  .H{max-width:100%;margin-bottom:6px}
+  .H-top{flex-wrap:wrap;gap:6px}
+  .H-l{gap:6px}
+  .rnd{font-size:11px;padding:2px 8px}
+  .dots .dot{width:5px;height:5px}
+  .H-sc-n{font-size:18px;min-width:32px}
+  .strk{font-size:10px;padding:2px 8px}
+  .Ts{font-size:12px}
+  .Ti{font-size:10px}
+
+  .B{max-width:100%;border-radius:12px;aspect-ratio:16/10}
+  .tile .tn{font-size:9px}
+
+  .res{padding:10px 0 2px}
+  .res-e{font-size:28px}
+  .res-l{font-size:15px}
+  .res-p{font-size:13px}
+
+  .I{max-width:100%;margin-top:8px}
+  .Ir{gap:6px}
+  .inp{padding:11px 14px;font-size:14px;border-radius:12px}
+  .btn-gs{padding:11px 20px;font-size:14px;border-radius:12px}
+  .btn-nxt{padding:13px 0;font-size:15px;border-radius:12px}
+  .btn-giveup{padding:8px 14px;font-size:12px;border-radius:10px}
+  .ht{font-size:10px;margin-top:8px}
+  .wt{font-size:12px;padding:6px 12px}
+
+  .Fe{font-size:44px}
+  .Fsc{font-size:56px}
+  .Frk{font-size:11px;padding:3px 12px}
+  .Fb{max-width:100%;height:6px;margin:10px 0}
+  .Fsub{font-size:12px;margin-bottom:14px}
+  .Fgrid{max-width:100%;gap:3px}
+  .Fc{border-radius:8px;font-size:15px}
+  .Fcs{font-size:8px}
+  .Frows{max-width:100%}
+  .Fr{padding:7px 10px;font-size:12px;border-radius:8px}
+  .Frn{width:36px;font-size:10px}
+  .Fpt{width:48px;font-size:12px}
+}
+
+@media(max-width:380px){
+  .s-t{font-size:20px}
+  .s-sub{font-size:12px}
+  .s-stat{padding:6px 10px}
+  .s-stat-v{font-size:15px}
+  .btn-go{padding:12px 36px;font-size:14px}
+  .B{aspect-ratio:4/3;border-radius:10px}
+  .Fsc{font-size:44px}
+  .Fgrid{grid-template-columns:repeat(5,1fr)}
+  .dots .dot{width:4px;height:4px}
+  .H-sc-n{font-size:16px}
+}
 `;
 
 export default function AnimeGuesser() {
@@ -297,14 +370,19 @@ export default function AnimeGuesser() {
     setTimeout(() => setFloats(p => p.filter(f => f.id !== id)), 1200);
   };
 
-  const endRound = (correct, sc) => {
+  const endRound = (correct, sc, surrendered = false) => {
     if (timerRef.current) clearInterval(timerRef.current);
-    const r = { correct, score: sc, answer: rounds[round].hint };
+    const r = { correct, score: sc, answer: rounds[round].hint, surrendered };
     setResult(r); setRScore(sc);
     if (correct) { setTotal(p => p + sc); setStreak(p => p + 1); addFloat(`+${sc}`, "var(--am)"); }
     else setStreak(0);
     setResults(p => [...p, r]);
     setRevealed(new Set(Array.from({ length: TOTAL }, (_, i) => i)));
+  };
+
+  const handleGiveUp = () => {
+    if (result || !rounds) return;
+    endRound(false, 0, true);
   };
 
   const handleSubmit = (e) => {
@@ -478,8 +556,8 @@ export default function AnimeGuesser() {
               <div className="res-p" style={{animation:"countPop 0.5s ease"}}>+{rScore} pts</div>
               <div className="res-sp">{speedLabel(time)}</div>
             </>):(<>
-              <div className="res-e">{time===0?"⏰":"🙅"}</div>
-              <div className="res-l" style={{color:"var(--r)"}}>{time===0?"Time's up!":"Nope!"}</div>
+              <div className="res-e">{result.surrendered?"🏳️":time===0?"⏰":"🙅"}</div>
+              <div className="res-l" style={{color:"var(--r)"}}>{result.surrendered?"Surrendered!":time===0?"Time's up!":"Nope!"}</div>
               <div className="res-miss">It was <strong>{rd.hint}</strong></div>
             </>)}
           </div>
@@ -491,6 +569,12 @@ export default function AnimeGuesser() {
               <input ref={inputRef} type="text" value={guess} onChange={e=>setGuess(e.target.value)}
                 placeholder="Type the anime name..." autoComplete="off" className={`inp ${wrongMsg?"er":""}`}/>
               <button type="submit" className="btn btn-gs">Guess</button>
+              <button type="button" className="btn-giveup" onClick={handleGiveUp} title="Give up">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                  <line x1="4" y1="22" x2="4" y2="15"/>
+                </svg>
+              </button>
             </form>
             {wrongMsg&&<div className="wt">{wrongMsg}</div>}
             <p className="ht">Click tiles to reveal · Type your answer · Unlimited guesses</p>
