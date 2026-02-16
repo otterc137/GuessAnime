@@ -220,13 +220,15 @@ html, body, #root {
 .s-t .shiny-text{display:inline-block;background:linear-gradient(90deg,#111 0%,#111 42%,rgba(255,255,255,0.9) 50%,#111 58%,#111 100%);background-size:400% 100%;background-clip:text;-webkit-background-clip:text;color:transparent;background-position:0 0;background-repeat:no-repeat;animation:shiny-text 12s cubic-bezier(0.6,0.6,0,1) infinite}
 @keyframes shiny-text{0%,90%,100%{background-position:0% 0}30%,60%{background-position:100% 0}}
 @keyframes shimmer-spin{to{transform:rotate(360deg)}}
+@keyframes shimmer-slide{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+@keyframes spin-around{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 @keyframes flip{0%{transform:perspective(120px) scaleX(1)}25%{transform:perspective(120px) scaleX(0)}50%{transform:perspective(120px) scaleX(1)}75%{transform:perspective(120px) scaleX(0)}100%{transform:perspective(120px) scaleX(1)}}
 .loader-card{backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .s-sub{font-family:'Space Mono',monospace;color:#666;font-size:13px;font-weight:400;line-height:1.5;text-align:left;width:100%;max-width:360px;margin-top:16px;margin-bottom:32px;text-transform:none;letter-spacing:0;margin-left:auto;margin-right:auto}
 .s-stats{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:28px;margin-bottom:28px;width:100%}
 .s-stat{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:24px 20px;flex:1;min-width:120px;border:none;border-radius:16px;box-shadow:0 2px 0 rgba(0,0,0,0.15);transition:transform 0.2s ease}
 .s-stat:hover{transform:rotate(0deg)}
-.s-stat--chartreuse{background:#DEFF0A;color:#111}
+.s-stat--chartreuse{background:rgba(230, 255, 66, 1);color:#111}
 .s-stat--chartreuse .s-stat-v,.s-stat--chartreuse .s-stat-l{color:#111}
 .s-stat--black{background:#111;color:#F5F5F0}
 .s-stat--black .s-stat-v,.s-stat--black .s-stat-l{color:#F5F5F0}
@@ -251,9 +253,16 @@ html, body, #root {
 .btn-go{width:100%;padding:16px 56px;font-size:14px;font-weight:800;color:#111;background:#DEFF0A;border:none;border-radius:9999px;text-transform:uppercase;letter-spacing:0.1em;transition:background 0.2s ease,color 0.2s ease}
 .btn-go:hover{background:#111;color:#DEFF0A}
 .btn-go:active{opacity:0.9}
-.btn-go.btn-go--shimmer{background:transparent;box-shadow:none;position:relative;overflow:hidden;z-index:0;transition:transform 0.2s ease,color 0.2s ease,box-shadow 0.2s ease}
-.btn-go.btn-go--shimmer:hover{color:#111;transform:scale(1.06);box-shadow:0 6px 20px rgba(0,0,0,0.12)}
-.btn-go.btn-go--shimmer:hover .btn-go-inner{background:#B8D900}
+.btn-shimmer{position:relative;z-index:0;overflow:hidden;background:var(--bg,#DEFF0A) !important;border:2px solid #A8C200}
+.btn-shimmer .btn-shimmer-edge{position:absolute;inset:0;z-index:-30;overflow:hidden;border-radius:9999px;filter:blur(2px)}
+.btn-shimmer .btn-shimmer-spark{position:absolute;inset:-100%;background:conic-gradient(from 225deg, transparent 0deg, rgba(255,255,220,0.95) 90deg, transparent 90deg);animation:spin-around 4s infinite linear}
+.btn-shimmer .btn-shimmer-fill{position:absolute;top:0;left:0;right:2px;bottom:2px;border-radius:9999px;background:var(--bg,#DEFF0A);z-index:-20}
+.shimmer-highlight{box-shadow:inset 0 -8px 10px rgba(0,0,0,0.06)}
+.btn-shimmer:hover .shimmer-highlight{box-shadow:inset 0 -6px 10px rgba(0,0,0,0.1)}
+.btn-shimmer span{position:relative;z-index:1;color:#111}
+.btn-shimmer:hover{color:#111;transform:scale(1.06);box-shadow:0 6px 20px rgba(0,0,0,0.12);border-color:#A8C200}
+.btn-shimmer:focus,.btn-shimmer:focus-visible{outline:2px solid #A8C200;outline-offset:2px}
+.btn-shimmer:hover .btn-shimmer-fill{background:rgba(220, 242, 74, 1)}
 .btn-go-inner{transition:background 0.2s ease}
 .btn-howto-wrap{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .btn-howto-wrap .btn-go,.btn-howto-wrap .btn-howto{width:230px;min-width:230px;max-width:230px;box-sizing:border-box;padding:16px 56px;font-size:14px;white-space:nowrap}
@@ -641,10 +650,10 @@ export default function AnimeGuesser() {
         else if (p < 80) setLoadMsg("Shuffling anime...");
         else setLoadMsg("Get ready...");
       } else {
-        if (p < 30) setLoadMsg("FETCHING ANIME SCENES...");
-        else if (p < 60) setLoadMsg("LOADING EPISODE FRAMES...");
-        else if (p < 90) setLoadMsg("ALMOST READY...");
-        else setLoadMsg("BUILDING ROUNDS...");
+        if (p < 30) setLoadMsg("SUMMONING ANIME SCENES...");
+        else if (p < 60) setLoadMsg("DECODING EPISODE FRAMES...");
+        else if (p < 90) setLoadMsg("ALMOST THERE...");
+        else setLoadMsg("ASSEMBLING ROUNDS...");
       }
     });
     if (pool.length === 0) {
@@ -664,11 +673,11 @@ export default function AnimeGuesser() {
     initRound();
   };
 
-  const LOADING_TIPS = ["FEWER TILES = MORE POINTS", "SPEED IS EVERYTHING", "TRUST YOUR INSTINCTS"];
+  const LOADING_TIPS = ["FEWER TILES = MORE POINTS", "SPEED RUN MODE: ON", "YOU KNOW YOUR ANIME", "REVEAL LESS, SCORE MORE", "IT'S IN THE EYES (AND HAIR)"];
   useEffect(() => {
     if (!loading) return;
     setLoadingTipIndex(0);
-    const id = setInterval(() => setLoadingTipIndex((i) => (i + 1) % 3), 2000);
+    const id = setInterval(() => setLoadingTipIndex((i) => (i + 1) % LOADING_TIPS.length), 2000);
     return () => clearInterval(id);
   }, [loading]);
   useEffect(() => {
@@ -894,13 +903,13 @@ export default function AnimeGuesser() {
             <h1 className="s-t"><span className="shiny-text">Guess the Anime</span></h1>
             <p className="s-sub">Reveal tiles from hidden anime images and name the anime before time runs out.</p>
             <div className="btn-howto-wrap">
-              <button className="btn btn-go btn-go--shimmer" onClick={startGame} style={{position:'relative',zIndex:0,overflow:'hidden',border:'none',background:'transparent'}}>
-              {/* Rotating gradient = shimmer on perimeter */}
-              <div style={{position:'absolute',inset:-2,zIndex:-30,borderRadius:'9999px',background:'conic-gradient(from 0deg, transparent 0deg, transparent 240deg, rgba(255,255,255,0.95) 270deg, transparent 300deg)',animation:'shimmer-spin 2.5s linear infinite'}}/>
-              {/* Inner pill covers center so only border shows gradient */}
-              <div className="btn-go-inner" style={{position:'absolute',inset:3,borderRadius:'9999px',background:'#DEFF0A',zIndex:-20}}/>
-              <span style={{position:'relative',zIndex:1}}>START GAME</span>
-            </button>
+              <button className="btn btn-go btn-shimmer" onClick={startGame} style={{'--spread':'90deg','--shimmer-color':'#EAFF60','--radius':'9999px','--speed':'3s','--cut':'0.05em','--bg':'rgba(220, 242, 74, 1)'}}>
+                <div className="btn-shimmer-edge">
+                  <div className="btn-shimmer-spark" />
+                </div>
+                <div className="btn-shimmer-fill shimmer-highlight" />
+                <span>START GAME</span>
+              </button>
               <button type="button" className="btn-howto" onClick={() => setShowRules(true)}>How to Play</button>
             </div>
           </div>
@@ -1150,8 +1159,10 @@ export default function AnimeGuesser() {
                   </div>
                 </div>
                 <div className="H-sc">
-                  <div className={`flame ${streak === 0 ? "flame--muted" : streak >= 5 ? "flame--hype" : streak >= 3 ? "flame--pulse" : ""}`} aria-hidden />
-                  <span className={`H-streak ${streak === 0 ? "H-streak--zero" : ""}`}>×{streak}</span>
+                  <span className="H-sc-streak-wrap" title="Correct guesses in a row" style={{display:"flex",alignItems:"center",gap:"inherit",cursor:"help"}}>
+                    <div className={`flame ${streak === 0 ? "flame--muted" : streak >= 5 ? "flame--hype" : streak >= 3 ? "flame--pulse" : ""}`} aria-hidden />
+                    <span className={`H-streak ${streak === 0 ? "H-streak--zero" : ""}`}>×{streak}</span>
+                  </span>
                   <span className="H-divider">·</span>
                   <span className={`H-sc-n ${scorePulse ? "score-pulse" : ""}`}>{total.toLocaleString()}<span className="H-sc-pts"> PTS</span></span>
                 </div>
