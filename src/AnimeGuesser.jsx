@@ -86,15 +86,44 @@ async function fetchJikanPics(malId) {
   } catch { return []; }
 }
 
+function preloadImage(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = url;
+  });
+}
+
 async function loadAllImages(onProgress) {
   const pool = [];
-  for (let i = 0; i < ANIME_DB.length; i++) {
-    const a = ANIME_DB[i];
-    if (i > 0) await new Promise(r => setTimeout(r, 1500));
-    const urls = await fetchJikanPics(a.mal);
-    for (const url of urls) pool.push({ image: url, accept: a.accept, hint: a.title });
-    onProgress(Math.round(((i + 1) / ANIME_DB.length) * 100));
+  const batchSize = 3;
+
+  for (let i = 0; i < ANIME_DB.length; i += batchSize) {
+    const batch = ANIME_DB.slice(i, i + batchSize);
+    const results = await Promise.all(
+      batch.map(a => fetchJikanPics(a.mal).catch(() => []))
+    );
+
+    results.forEach((urls, j) => {
+      const a = batch[j];
+      for (const url of urls) {
+        pool.push({ image: url, accept: a.accept, hint: a.title });
+      }
+    });
+
+    onProgress(Math.round(((i + batchSize) / ANIME_DB.length) * 100));
+
+    if (pool.length >= 30) {
+      onProgress(100);
+      return pool;
+    }
+
+    if (i + batchSize < ANIME_DB.length) {
+      await new Promise(r => setTimeout(r, 400));
+    }
   }
+
   return pool;
 }
 
@@ -174,11 +203,22 @@ function genLandingConfetti() {
 }
 
 function calcScore(tilesRevealed, timeLeft, totalTime) {
-  const tileFactor = Math.max(0, 1 - (tilesRevealed - 1) / 23);
-  const timeFactor = timeLeft / totalTime;
+  const totalTiles = 24;
 
-  const score = Math.round(tileFactor * 750 + timeFactor * 200 + 50);
-  return Math.min(score, 1000); // Hard cap at 1000
+  // Tile score: 1 tile = 950, each additional tile loses points
+  const tileScore = Math.round(950 * Math.max(0, 1 - (tilesRevealed - 1) / (totalTiles - 1)));
+
+  // Time bonus: up to 50 points (full if answered within first 3 seconds)
+  const timeElapsed = totalTime - timeLeft;
+  let timeBonus = 0;
+  if (timeElapsed <= 3) {
+    timeBonus = 50;
+  } else {
+    timeBonus = Math.round(50 * Math.max(0, timeLeft / (totalTime - 3)));
+  }
+
+  const total = tileScore + timeBonus;
+  return Math.max(Math.min(total, 1000), 50); // Min 50, max 1000
 }
 
 function getRank(p) {
@@ -555,7 +595,7 @@ html, body, #root {
   .rnd{padding:8px 14px;font-size:11px}
   .s-hero{max-width:1100px;gap:100px}
   .s-t{font-size:72px;line-height:1.05;letter-spacing:0.02em;max-width:8ch}
-  .s-sub{font-size:14px;line-height:1.55;max-width:420px}
+  .s-sub{font-size:18px;line-height:1.55;max-width:420px}
   .btn-go{padding:18px 60px;font-size:16px;transition:all 0.2s ease}
   .btn-howto-wrap .btn-go,.btn-howto-wrap .btn-howto{width:250px;min-width:250px;max-width:250px;padding:18px 60px;font-size:16px}
   .s-stats{gap:14px}
@@ -734,6 +774,7 @@ export default function AnimeGuesser() {
       setLoading(false);
       return;
     }
+    await Promise.all(r.slice(0, 3).map(round => preloadImage(round.image)));
     setRounds(r);
     setLoading(false);
     setScreen("playing");
@@ -767,8 +808,37 @@ export default function AnimeGuesser() {
     return () => clearTimeout(t);
   }, [screen, loading, loadError]);
 
+  useEffect(() => {
+    if (screen === 'results') {
+      setShowConfetti(true);
+      setConfettiPieces(genConfetti());
+      const timer = setTimeout(() => setShowConfetti(false), 4000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowConfetti(false);
+    }
+  }, [screen]);
+
+  useEffect(() => {
+    if (!result || screen !== 'playing') return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        nextRound();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [result, screen]);
+
   useEffect(() => { if (time === 0 && screen === "playing" && !result) endRound(false, 0); }, [time, screen, result]);
   useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
+
+  useEffect(() => {
+    if (screen !== "playing" || !rounds) return;
+    if (rounds[round + 1]) preloadImage(rounds[round + 1].image);
+    if (rounds[round + 2]) preloadImage(rounds[round + 2].image);
+  }, [round, screen, rounds]);
 
   const UNICORN_SDK = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.5/dist/unicornStudio.umd.js";
   useEffect(() => {
@@ -850,10 +920,7 @@ export default function AnimeGuesser() {
     setResult(r); setRScore(sc);
     if (correct) {
       setTotal(p => p + sc); setStreak(p => p + 1); addFloat(`+${sc}`, "#111");
-      setShowConfetti(true); setConfettiPieces(genConfetti());
       setIsShaking(true); setBoardPulse(true); setDisplayScore(0); setScorePulse(true);
-      setTimeout(() => setShowConfetti(false), 1100);
-      setTimeout(() => setConfettiPieces([]), 1100);
       setTimeout(() => setIsShaking(false), 300);
       setTimeout(() => setBoardPulse(false), 500);
       setTimeout(() => setScorePulse(false), 400);
@@ -1073,7 +1140,11 @@ export default function AnimeGuesser() {
             ctx.arc(200, y + 40, 40, 0, Math.PI * 2);
             ctx.closePath();
             ctx.clip();
-            ctx.drawImage(img, 120, y, 160, 80);
+            const d = 80;
+            const scale = Math.max(d / img.naturalWidth, d / img.naturalHeight);
+            const dw = img.naturalWidth * scale;
+            const dh = img.naturalHeight * scale;
+            ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 200 - dw / 2, y + 40 - dh / 2, dw, dh);
             ctx.restore();
             y += 88;
             drawRest(false);
@@ -1158,6 +1229,16 @@ export default function AnimeGuesser() {
 
     return (
       <div className="R"><style>{CSS}</style>
+        {screen === 'results' && showConfetti && (
+          <div className="confetti-wrap" style={{position:'fixed',inset:0,pointerEvents:'none',zIndex:50}}>
+            {confettiPieces.map(p=>(
+              <div key={p.id} className="confetti-piece" style={{
+                background:p.color,
+                "--cx":`${p.cx}px`,"--cy":`${p.cy}px`,"--rot":`${p.rot}deg`
+              }}/>
+            ))}
+          </div>
+        )}
         <div className="S S--results">
           <div className="res-wrap">
             <div className="res-profile">
@@ -1169,7 +1250,7 @@ export default function AnimeGuesser() {
                 onChange={handleAvatarChange}
               />
               <div className="res-avatar" onClick={() => avatarInputRef.current?.click()} role="button" tabIndex={0} aria-label="Upload profile image" title="Click to upload image" onKeyDown={e => e.key === "Enter" && avatarInputRef.current?.click()}>
-                {avatar ? <img src={avatar} alt="" /> : (
+                {avatar ? <img src={avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : (
                   <span className="res-avatar-icon" aria-hidden>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -1295,16 +1376,6 @@ export default function AnimeGuesser() {
             <div className="board-wrap">
             <div className={bc} style={{position:"relative"}}>
               {showOverlay && <div className="result-overlay" aria-hidden />}
-              {showConfetti && (
-                <div className="confetti-wrap">
-                  {confettiPieces.map(p=>(
-                    <div key={p.id} className="confetti-piece" style={{
-                      background:p.color,
-                      "--cx":`${p.cx}px`,"--cy":`${p.cy}px`,"--rot":`${p.rot}deg`
-                    }}/>
-                  ))}
-                </div>
-              )}
               <img src={rd.image} alt=""/>
               <div className="G">
                 {Array.from({length:TOTAL},(_,i)=>(
