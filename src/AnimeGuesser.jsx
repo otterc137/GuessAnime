@@ -22,6 +22,19 @@ const NUM_ROUNDS = 10;
 const TIMER = 60, COLS = 6, ROWS = 4, TOTAL = COLS * ROWS;
 const LOADING_IMAGES = ['/loading/1.jpg', '/loading/2.jpg', '/loading/3.jpg', '/loading/4.jpg'];
 
+const DEFAULT_LEADERBOARD = [
+  { id: 'd1', name: 'Anonymous', score: 2847, correct: 4 },
+  { id: 'd2', name: 'Anonymous', score: 2534, correct: 3 },
+  { id: 'd3', name: 'Anonymous', score: 2211, correct: 3 },
+  { id: 'd4', name: 'Anonymous', score: 1987, correct: 2 },
+  { id: 'd5', name: 'Anonymous', score: 1756, correct: 2 },
+  { id: 'd6', name: 'Anonymous', score: 1543, correct: 2 },
+  { id: 'd7', name: 'Anonymous', score: 1320, correct: 1 },
+  { id: 'd8', name: 'Anonymous', score: 1198, correct: 1 },
+  { id: 'd9', name: 'Anonymous', score: 1045, correct: 1 },
+  { id: 'd10', name: 'Anonymous', score: 1002, correct: 1 },
+];
+
 async function fetchJikanPics(malId) {
   try {
     const images = [];
@@ -383,12 +396,12 @@ html, body, #root {
 .modal-rule:last-of-type{margin-bottom:0}
 .modal-rule-badge{width:32px;height:32px;border-radius:50%;background:#DEFF0A;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#111;flex-shrink:0}
 .modal-rule-text{font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;font-size:15px;color:#333;font-weight:500}
-.modal-tips{margin-top:20px;padding-top:16px;border-top:1px solid #eee}
-.modal-tips-label{font-size:11px;color:#999;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:10px}
-.modal-tips-list{list-style:none;padding:0;margin:0;font-size:13px;color:#555;font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;line-height:1.6}
+.modal-tips{margin-top:20px;padding:16px;border-radius:12px;background:rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.08)}
+.modal-tips-label{font-size:11px;color:#444;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-transform:uppercase;letter-spacing:0.08em;display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.modal-tips-list{list-style:none;padding:0;margin:0;font-size:13px;color:#333;font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;line-height:1.6}
 .modal-tips-list li{padding-left:18px;position:relative;margin-bottom:6px}
 .modal-tips-list li:last-child{margin-bottom:0}
-.modal-tips-list li::before{content:'';position:absolute;left:0;top:0.5em;width:4px;height:4px;border-radius:50%;background:#DEFF0A}
+.modal-tips-list li::before{content:'';position:absolute;left:0;top:0.5em;width:4px;height:4px;border-radius:50%;background:#111}
 .modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;min-width:32px;min-height:32px;padding:0;border-radius:50%;aspect-ratio:1;background:#111;color:#F5F5F0;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-sizing:border-box;flex-shrink:0}
 .modal-close .modal-close-icon{display:flex;align-items:center;justify-content:center;width:100%;height:100%;line-height:0;pointer-events:none}
 .modal-close:hover{opacity:0.9}
@@ -534,7 +547,7 @@ html, body, #root {
 .round-score-pill{padding:4px 12px;border-radius:9999px;font-size:12px;font-weight:900;font-family:'Space Mono',monospace}
 .round-score-pill.correct{background:#DEFF0A;color:#111}
 .round-score-pill.miss{background:#111;color:#F5F5F0}
-.leaderboard{width:100%;max-width:500px;margin:20px auto 0;background:#FFFFFF;border-radius:20px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 4px 24px rgba(0,0,0,0.06),0 1px 4px rgba(0,0,0,0.04);overflow:hidden;padding:0}
+.leaderboard{width:100%;max-width:500px;margin:20px auto 0;background:#FFFFFF;border-radius:20px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 4px 24px rgba(0,0,0,0.06),0 1px 4px rgba(0,0,0,0.04),inset 0 2px 8px rgba(0,0,0,0.04),inset 0 -2px 6px rgba(0,0,0,0.02);overflow:hidden;padding:0}
 .lb-header{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 20px;background:#111;color:#F5F5F0;font-family:'Vina Sans',sans-serif;font-size:18px;text-transform:uppercase;letter-spacing:0.05em}
 .lb-podium{display:flex;justify-content:center;align-items:flex-end;gap:12px;padding:24px 16px 16px;background:linear-gradient(180deg,rgba(200,230,0,0.06) 0%,transparent 100%)}
 .lb-podium-item{display:flex;flex-direction:column;align-items:center;gap:4px}
@@ -542,6 +555,7 @@ html, body, #root {
 .lb-podium-item.second{order:1}
 .lb-podium-item.third{order:3}
 .lb-podium-rank{font-size:24px;line-height:1}
+.lb-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .lb-podium-score-bar{width:80px;border-radius:10px 10px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:12px 8px 10px}
 .lb-podium-item.first .lb-podium-score-bar{height:100px;background:linear-gradient(180deg,#C8E600,#A8C200)}
 .lb-podium-item.second .lb-podium-score-bar{height:76px;background:linear-gradient(180deg,#E8E8E8,#CCCCCC)}
@@ -840,8 +854,9 @@ export default function AnimeGuesser() {
   const [imageSaved, setImageSaved] = useState(false);
   const avatarInputRef = useRef(null);
   const [showRoundsModal, setShowRoundsModal] = useState(false);
-  const [leaderboard, setLeaderboard] = useState([]);
+  const [leaderboard, setLeaderboard] = useState(DEFAULT_LEADERBOARD);
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
+  const scoreSubmittedRef = useRef(false);
 
   const startGame = async () => {
     const replay = screen === "results" || screen === "playing";
@@ -925,19 +940,51 @@ export default function AnimeGuesser() {
   }, [screen]);
 
   useEffect(() => {
+    scoreSubmittedRef.current = scoreSubmitted;
+  }, [scoreSubmitted]);
+
+  useEffect(() => {
     if (screen === 'results') {
-      getTopScores(10).then(setLeaderboard).catch(() => setLeaderboard([]));
+      getTopScores(10).then(scores => {
+        if (scoreSubmittedRef.current) return;
+        if (scores && scores.length > 0) {
+          const merged = [...scores];
+          let i = 0;
+          while (merged.length < 10 && i < DEFAULT_LEADERBOARD.length) {
+            merged.push(DEFAULT_LEADERBOARD[i]);
+            i++;
+          }
+          merged.sort((a, b) => b.score - a.score);
+          setLeaderboard(merged.slice(0, 10));
+        } else {
+          setLeaderboard(DEFAULT_LEADERBOARD);
+        }
+      }).catch(() => {
+        if (!scoreSubmittedRef.current) setLeaderboard(DEFAULT_LEADERBOARD);
+      });
     }
   }, [screen]);
 
   useEffect(() => {
-    if (screen === 'results' && !scoreSubmitted) {
-      const correctCount = results.filter(r => r.correct).length;
-      submitScore(playerName, total, correctCount, avatar);
+    if (screen === 'results' && !scoreSubmitted && total > 0) {
+      const playerEntry = {
+        id: 'me',
+        name: playerName || 'You',
+        score: total,
+        correct: results.filter(r => r.correct).length,
+        isMe: true,
+      };
+
+      const updated = [...leaderboard, playerEntry]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10);
+
+      setLeaderboard(updated);
+
+      submitScore(playerName, total, playerEntry.correct, avatar).catch(() => {});
       setScoreSubmitted(true);
-      setTimeout(() => getTopScores(10).then(setLeaderboard).catch(() => setLeaderboard([])), 1000);
     }
-  }, [screen, scoreSubmitted]);
+  }, [screen, scoreSubmitted, leaderboard]);
 
   useEffect(() => {
     if (!result || screen !== 'playing') return;
@@ -1157,7 +1204,14 @@ export default function AnimeGuesser() {
                 <span className="modal-rule-text">Fewer tiles + faster = more points</span>
               </div>
               <div className="modal-tips">
-                <span className="modal-tips-label">Tips</span>
+                <span className="modal-tips-label">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M9 18h6"/>
+                    <path d="M10 22h4"/>
+                    <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0018 8 6 6 0 006 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 018.91 14"/>
+                  </svg>
+                  TIPS
+                </span>
                 <ul className="modal-tips-list">
                   <li>Reveal fewer tiles to earn more points.</li>
                   <li>Guess quickly—speed boosts your score.</li>
@@ -1405,7 +1459,16 @@ export default function AnimeGuesser() {
               SEE ROUND DETAILS
             </button>
             <div className="leaderboard">
-              <div className="lb-header">🏆 TOP 10</div>
+              <div className="lb-header">
+                <svg width="18" height="18" viewBox="0 0 32 32" fill="none" style={{marginRight: 8}}>
+                  <path d="M8 4h16v8c0 5-3.5 8-8 8s-8-3-8-8V4z" fill="#C8E600"/>
+                  <path d="M10 5h5v7c0 2-1 4-2.5 4S10 14 10 12V5z" fill="rgba(255,255,255,0.2)"/>
+                  <rect x="8" y="3" width="16" height="2" rx="1" fill="#E0FF66"/>
+                  <rect x="12" y="20" width="8" height="3" rx="1" fill="#111"/>
+                  <rect x="10" y="23" width="12" height="2" rx="1" fill="#111"/>
+                </svg>
+                TOP 10
+              </div>
               {leaderboard.length === 0 ? (
                 <div style={{padding: '24px 16px', textAlign: 'center'}}>
                   <p style={{fontFamily: "'Space Mono',monospace", fontSize: 12, color: '#999'}}>
@@ -1415,8 +1478,51 @@ export default function AnimeGuesser() {
               ) : leaderboard.length < 3 ? (
                 <div className="lb-list">
                   {leaderboard.map((entry, i) => (
-                    <div className={`lb-row ${entry.name === playerName && entry.score === total ? 'is-me' : ''}`} key={entry.id}>
-                      <span className="lb-rank">{['👑','🥈','🥉'][i]}</span>
+                    <div className={`lb-row ${entry.isMe ? 'is-me' : ''}`} key={entry.id}>
+                      <div className="lb-icon">
+                        {i === 0 ? (
+                          <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                            <ellipse cx="16" cy="30" rx="8" ry="1.5" fill="rgba(0,0,0,0.08)"/>
+                            <rect x="9" y="24" width="14" height="3" rx="1.5" fill="#111" />
+                            <rect x="9" y="24" width="14" height="1.5" rx="0.75" fill="#333" />
+                            <rect x="13" y="20" width="6" height="5" rx="1" fill="#111"/>
+                            <rect x="13.5" y="20" width="2.5" height="4" rx="0.5" fill="rgba(255,255,255,0.08)"/>
+                            <path d="M7 4h18v10c0 5-4 8-9 8s-9-3-9-8V4z" fill="#C8E600"/>
+                            <path d="M7 4h18v10c0 5-4 8-9 8s-9-3-9-8V4z" fill="url(#trophy-grad-list)"/>
+                            <path d="M9 5h6v8c0 3-1.5 5-3 5s-3-2-3-5V5z" fill="rgba(255,255,255,0.25)"/>
+                            <rect x="7" y="3" width="18" height="2.5" rx="1.25" fill="#C8E600"/>
+                            <rect x="7" y="3" width="18" height="1.2" rx="0.6" fill="#E0FF66"/>
+                            <path d="M7 7H4a1 1 0 00-1 1v3a4 4 0 004 4V7z" fill="#A8C200"/>
+                            <path d="M5 8h1v5a3 3 0 01-2.5-3V9a1 1 0 011.5-1z" fill="rgba(255,255,255,0.15)"/>
+                            <path d="M25 7h3a1 1 0 011 1v3a4 4 0 01-4 4V7z" fill="#A8C200"/>
+                            <path d="M16 8l1.5 3 3.5.5-2.5 2.5.5 3.5-3-1.5-3 1.5.5-3.5L11 11.5l3.5-.5z" fill="#111" opacity="0.15"/>
+                            <defs>
+                              <linearGradient id="trophy-grad-list" x1="7" y1="4" x2="25" y2="22">
+                                <stop offset="0%" stopColor="rgba(255,255,255,0.2)"/>
+                                <stop offset="100%" stopColor="rgba(0,0,0,0.1)"/>
+                              </linearGradient>
+                            </defs>
+                          </svg>
+                        ) : i === 1 ? (
+                          <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+                            <ellipse cx="16" cy="29" rx="7" ry="1.5" fill="rgba(0,0,0,0.06)"/>
+                            <path d="M16 4l3.5 7 7.5 1.2-5.5 5.3 1.3 7.5-6.8-3.5-6.8 3.5 1.3-7.5L5 12.2l7.5-1.2z" fill="#B0B0B0" transform="translate(0.5, 0.8)"/>
+                            <path d="M16 4l3.5 7 7.5 1.2-5.5 5.3 1.3 7.5-6.8-3.5-6.8 3.5 1.3-7.5L5 12.2l7.5-1.2z" fill="#DDD"/>
+                            <path d="M16 6l2 4.5 5 .8-3.5 3.5.8 5-4.3-2.3V6z" fill="rgba(255,255,255,0.35)"/>
+                            <path d="M16 9l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9-3.6 1.9.7-4-2.9-2.8 4-.6z" fill="none" stroke="#BBB" strokeWidth="0.5"/>
+                          </svg>
+                        ) : (
+                          <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+                            <ellipse cx="16" cy="29" rx="6" ry="1.2" fill="rgba(0,0,0,0.06)"/>
+                            <path d="M16 3L26 10v12l-10 7-10-7V10z" fill="#C4944A" transform="translate(0.4, 0.6)"/>
+                            <path d="M16 3L26 10v12l-10 7-10-7V10z" fill="#F0C68B"/>
+                            <path d="M16 3L6 10v12l10 7V3z" fill="rgba(255,255,255,0.15)"/>
+                            <path d="M16 3L26 10 16 12 6 10z" fill="rgba(255,255,255,0.25)"/>
+                            <path d="M16 8l5 3.5v7L16 22l-5-3.5v-7z" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.8"/>
+                            <circle cx="12" cy="10" r="1.5" fill="rgba(255,255,255,0.4)"/>
+                          </svg>
+                        )}
+                      </div>
                       <span className="lb-name">{entry.name || 'Anonymous'}</span>
                       <span className="lb-row-score">{entry.score.toLocaleString()}</span>
                     </div>
@@ -1427,7 +1533,50 @@ export default function AnimeGuesser() {
                   <div className="lb-podium">
                     {[1, 0, 2].map(i => (
                       <div className={`lb-podium-item ${['first','second','third'][i]}`} key={leaderboard[i].id}>
-                        <span className="lb-podium-rank">{['👑','🥈','🥉'][i]}</span>
+                        <div className="lb-icon">
+                          {i === 1 ? (
+                            <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                              <ellipse cx="16" cy="30" rx="8" ry="1.5" fill="rgba(0,0,0,0.08)"/>
+                              <rect x="9" y="24" width="14" height="3" rx="1.5" fill="#111" />
+                              <rect x="9" y="24" width="14" height="1.5" rx="0.75" fill="#333" />
+                              <rect x="13" y="20" width="6" height="5" rx="1" fill="#111"/>
+                              <rect x="13.5" y="20" width="2.5" height="4" rx="0.5" fill="rgba(255,255,255,0.08)"/>
+                              <path d="M7 4h18v10c0 5-4 8-9 8s-9-3-9-8V4z" fill="#C8E600"/>
+                              <path d="M7 4h18v10c0 5-4 8-9 8s-9-3-9-8V4z" fill="url(#trophy-grad)"/>
+                              <path d="M9 5h6v8c0 3-1.5 5-3 5s-3-2-3-5V5z" fill="rgba(255,255,255,0.25)"/>
+                              <rect x="7" y="3" width="18" height="2.5" rx="1.25" fill="#C8E600"/>
+                              <rect x="7" y="3" width="18" height="1.2" rx="0.6" fill="#E0FF66"/>
+                              <path d="M7 7H4a1 1 0 00-1 1v3a4 4 0 004 4V7z" fill="#A8C200"/>
+                              <path d="M5 8h1v5a3 3 0 01-2.5-3V9a1 1 0 011.5-1z" fill="rgba(255,255,255,0.15)"/>
+                              <path d="M25 7h3a1 1 0 011 1v3a4 4 0 01-4 4V7z" fill="#A8C200"/>
+                              <path d="M16 8l1.5 3 3.5.5-2.5 2.5.5 3.5-3-1.5-3 1.5.5-3.5L11 11.5l3.5-.5z" fill="#111" opacity="0.15"/>
+                              <defs>
+                                <linearGradient id="trophy-grad" x1="7" y1="4" x2="25" y2="22">
+                                  <stop offset="0%" stopColor="rgba(255,255,255,0.2)"/>
+                                  <stop offset="100%" stopColor="rgba(0,0,0,0.1)"/>
+                                </linearGradient>
+                              </defs>
+                            </svg>
+                          ) : i === 0 ? (
+                            <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+                              <ellipse cx="16" cy="29" rx="7" ry="1.5" fill="rgba(0,0,0,0.06)"/>
+                              <path d="M16 4l3.5 7 7.5 1.2-5.5 5.3 1.3 7.5-6.8-3.5-6.8 3.5 1.3-7.5L5 12.2l7.5-1.2z" fill="#B0B0B0" transform="translate(0.5, 0.8)"/>
+                              <path d="M16 4l3.5 7 7.5 1.2-5.5 5.3 1.3 7.5-6.8-3.5-6.8 3.5 1.3-7.5L5 12.2l7.5-1.2z" fill="#DDD"/>
+                              <path d="M16 6l2 4.5 5 .8-3.5 3.5.8 5-4.3-2.3V6z" fill="rgba(255,255,255,0.35)"/>
+                              <path d="M16 9l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9-3.6 1.9.7-4-2.9-2.8 4-.6z" fill="none" stroke="#BBB" strokeWidth="0.5"/>
+                            </svg>
+                          ) : (
+                            <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+                              <ellipse cx="16" cy="29" rx="6" ry="1.2" fill="rgba(0,0,0,0.06)"/>
+                              <path d="M16 3L26 10v12l-10 7-10-7V10z" fill="#C4944A" transform="translate(0.4, 0.6)"/>
+                              <path d="M16 3L26 10v12l-10 7-10-7V10z" fill="#F0C68B"/>
+                              <path d="M16 3L6 10v12l10 7V3z" fill="rgba(255,255,255,0.15)"/>
+                              <path d="M16 3L26 10 16 12 6 10z" fill="rgba(255,255,255,0.25)"/>
+                              <path d="M16 8l5 3.5v7L16 22l-5-3.5v-7z" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.8"/>
+                              <circle cx="12" cy="10" r="1.5" fill="rgba(255,255,255,0.4)"/>
+                            </svg>
+                          )}
+                        </div>
                         <div className="lb-podium-score-bar">
                           <span className="lb-podium-score">{leaderboard[i].score.toLocaleString()}</span>
                         </div>
@@ -1437,7 +1586,7 @@ export default function AnimeGuesser() {
                   </div>
                   <div className="lb-list">
                     {leaderboard.slice(3).map((entry, i) => (
-                      <div className={`lb-row ${entry.name === playerName && entry.score === total ? 'is-me' : ''}`} key={entry.id}>
+                      <div className={`lb-row ${entry.isMe ? 'is-me' : ''}`} key={entry.id}>
                         <span className="lb-rank">#{i + 4}</span>
                         <span className="lb-name">{entry.name || 'Anonymous'}</span>
                         <span className="lb-row-score">{entry.score.toLocaleString()}</span>
