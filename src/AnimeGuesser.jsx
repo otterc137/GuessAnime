@@ -217,7 +217,7 @@ html, body, #root {
 
 .s-z{position:relative;z-index:2}
 .s-t{font-family:'Vina Sans','Impact','Arial Black',sans-serif;font-weight:400;font-size:68px;letter-spacing:0.05em;color:var(--t);margin-bottom:16px;line-height:1.05;text-transform:uppercase;text-align:left;width:100%}
-.s-t .shiny-text{display:inline-block;background:linear-gradient(90deg,#111 0%,#111 42%,rgba(255,255,255,0.9) 50%,#111 58%,#111 100%);background-size:400% 100%;background-clip:text;-webkit-background-clip:text;color:transparent;background-position:0 0;background-repeat:no-repeat;animation:shiny-text 12s cubic-bezier(0.6,0.6,0,1) infinite}
+.s-t .shiny-text{margin-top:36px;display:inline-block;background:linear-gradient(90deg,#111 0%,#111 42%,rgba(255,255,255,0.9) 50%,#111 58%,#111 100%);background-size:400% 100%;background-clip:text;-webkit-background-clip:text;color:transparent;background-position:0 0;background-repeat:no-repeat;animation:shiny-text 12s cubic-bezier(0.6,0.6,0,1) infinite}
 @keyframes shiny-text{0%,90%,100%{background-position:0% 0}30%,60%{background-position:100% 0}}
 @keyframes shimmer-spin{to{transform:rotate(360deg)}}
 @keyframes shimmer-slide{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
