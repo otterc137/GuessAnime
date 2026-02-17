@@ -594,7 +594,7 @@ html, body, #root {
   .H-sc-n{font-size:26px}
   .rnd{padding:8px 14px;font-size:11px}
   .s-hero{max-width:1100px;gap:100px}
-  .s-t{font-size:72px;line-height:1.05;letter-spacing:0.02em;max-width:8ch}
+  .s-t{font-size:56px;line-height:1.05;letter-spacing:0.02em;max-width:12ch}
   .s-sub{font-size:18px;line-height:1.55;max-width:420px}
   .btn-go{padding:18px 60px;font-size:16px;transition:all 0.2s ease}
   .btn-howto-wrap .btn-go,.btn-howto-wrap .btn-howto{width:250px;min-width:250px;max-width:250px;padding:18px 60px;font-size:16px}
@@ -618,7 +618,7 @@ html, body, #root {
 
 @media (min-width: 1440px){
   .s-hero{max-width:1200px;gap:120px}
-  .s-t{font-size:84px;max-width:8ch}
+  .s-t{font-size:56px;max-width:12ch}
   .s-stat-v{font-size:52px}
 }
 
@@ -795,18 +795,6 @@ export default function AnimeGuesser() {
     }, 600);
     return () => clearInterval(interval);
   }, [loading]);
-
-  useEffect(() => {
-    if (screen !== "start" || loading || loadError || landingConfettiShownRef.current) return;
-    landingConfettiShownRef.current = true;
-    setShowLandingConfetti(true);
-    setLandingConfettiPieces(genLandingConfetti());
-    const t = setTimeout(() => {
-      setShowLandingConfetti(false);
-      setLandingConfettiPieces([]);
-    }, 3200);
-    return () => clearTimeout(t);
-  }, [screen, loading, loadError]);
 
   useEffect(() => {
     if (screen === 'results') {
@@ -1006,25 +994,6 @@ export default function AnimeGuesser() {
             <button className="btn btn-go" onClick={startGame}>Retry</button>
           </div>
         ) : (<>
-        {showLandingConfetti && (
-          <div className="landing-confetti-wrap" aria-hidden>
-            {landingConfettiPieces.map(p => (
-              <div
-                key={p.id}
-                className="landing-confetti-piece"
-                style={{
-                  left: `${p.left}%`,
-                  background: p.color,
-                  ['--tx']: `${p.tx}px`,
-                  ['--ty']: `${p.ty}vh`,
-                  ['--rot']: `${p.rot}deg`,
-                  animationDelay: `${p.delay}s`,
-                  animationDuration: `${p.duration}s`,
-                }}
-              />
-            ))}
-          </div>
-        )}
         {showRules && (
           <div
             className={`modal-backdrop ${modalExiting ? "modal-exit" : ""}`}
@@ -1229,17 +1198,17 @@ export default function AnimeGuesser() {
 
     return (
       <div className="R"><style>{CSS}</style>
-        {screen === 'results' && showConfetti && (
-          <div className="confetti-wrap" style={{position:'fixed',inset:0,pointerEvents:'none',zIndex:50}}>
-            {confettiPieces.map(p=>(
-              <div key={p.id} className="confetti-piece" style={{
-                background:p.color,
-                "--cx":`${p.cx}px`,"--cy":`${p.cy}px`,"--rot":`${p.rot}deg`
-              }}/>
-            ))}
-          </div>
-        )}
         <div className="S S--results">
+          {showConfetti && (
+            <div className="confetti-wrap" style={{position:'fixed',inset:0,pointerEvents:'none',zIndex:50}}>
+              {confettiPieces.map(p=>(
+                <div key={p.id} className="confetti-piece" style={{
+                  background:p.color,
+                  "--cx":`${p.cx}px`,"--cy":`${p.cy}px`,"--rot":`${p.rot}deg`
+                }}/>
+              ))}
+            </div>
+          )}
           <div className="res-wrap">
             <div className="res-profile">
               <input
