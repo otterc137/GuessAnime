@@ -508,17 +508,16 @@ html, body, #root {
 .res-avatar-icon{color:#999;font-size:24px;line-height:1;pointer-events:none;display:flex;align-items:center;justify-content:center}
 .res-avatar-icon svg{display:block}
 .res-avatar:hover .res-avatar-icon{color:#777}
-.res-name-input-wrap{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:8px 0;border-bottom:1.5px solid #e0e0d8;transition:border-color 0.2s ease, box-shadow 0.2s ease;min-width:180px}
-.res-name-input-wrap:focus-within{border-bottom-color:#111;outline:none}
-.res-name-input-wrap .res-name-input-edit-icon{flex-shrink:0;color:#999;transition:color 0.2s ease;display:flex;align-items:center;justify-content:center}
-.res-name-input-wrap:focus-within .res-name-input-edit-icon{color:#111}
-.res-name-input-wrap .res-name-input-edit-icon svg{display:block;width:14px;height:14px}
 .res-name-input{background:transparent;border:none;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:center;color:#111;padding:0;width:100%;min-width:0;flex:1;outline:none}
 .res-name-input::placeholder{color:#999}
-.result-name-input{background:#FFFFFF;border:2px solid #111;border-radius:12px;font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#111;text-align:center;padding:10px 16px;outline:none;max-width:200px;width:100%;caret-color:#C8E600;transition:border-color 0.2s,box-shadow 0.2s}
+.name-input-wrapper{display:flex;align-items:center;background:#FFFFFF;font-size:14px;border:1px solid rgba(153,153,153,0.05);border-image:none;border-radius:12px;padding:0 16px;max-width:220px;width:100%;margin:0 auto;transition:border-color 0.2s,box-shadow 0.2s}
+.name-input-wrapper:focus-within{border-color:#C8E600;box-shadow:0 0 0 3px rgba(200,230,0,0.25)}
+.name-edit-icon{flex-shrink:0;margin-right:8px}
+.name-input-wrapper:focus-within .name-edit-icon{stroke:#C8E600}
+.result-name-input{background:none;border:none;font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#111;text-align:center;padding:10px 0;outline:none;width:100%;caret-color:#C8E600}
 .result-name-input::placeholder{color:#CCC;font-weight:500}
-.result-name-input:focus{border-color:#C8E600;box-shadow:0 0 0 3px rgba(200,230,0,0.25)}
-.save-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#111;color:#C8E600;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.1em;padding:10px 24px;border-radius:9999px;z-index:200;animation:toastIn 0.3s ease,toastOut 0.3s ease 1.7s forwards}
+.save-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#111;color:#C8E600;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:0.1em;padding:10px 24px;border-radius:9999px;z-index:200;animation:toastIn 0.3s ease,toastOut 0.3s ease 1.7s forwards;display:inline-flex;align-items:center;gap:8px}
+.save-toast-icon{font-size:20px;line-height:1}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes toastOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(-10px)}}
 .res-title{font-family:Gasoek;font-size:22px;text-transform:uppercase;color:#111;margin-bottom:8px;padding-bottom:12px}
@@ -956,20 +955,25 @@ export default function AnimeGuesser() {
 
   useEffect(() => {
     if (screen === 'results') {
-      getTopScores(10).then(scores => {
-        if (scoreSubmittedRef.current) return;
-        const list = scores && scores.length > 0 ? scores : [];
-        const merged = [...list];
-        let i = 0;
-        while (merged.length < 10 && i < DEFAULT_LEADERBOARD.length) {
-          merged.push(DEFAULT_LEADERBOARD[i]);
-          i++;
-        }
-        merged.sort((a, b) => b.score - a.score);
-        setLeaderboard(merged.slice(0, 10));
-      }).catch(() => {
-        if (!scoreSubmittedRef.current) setLeaderboard(DEFAULT_LEADERBOARD);
-      });
+      try {
+        getTopScores(10).then(scores => {
+          if (scores && scores.length > 0) {
+            const merged = [...scores];
+            let i = 0;
+            while (merged.length < 10 && i < DEFAULT_LEADERBOARD.length) {
+              merged.push(DEFAULT_LEADERBOARD[i]);
+              i++;
+            }
+            merged.sort((a, b) => b.score - a.score);
+            setLeaderboard(merged.slice(0, 10));
+          }
+          // If no scores, keep DEFAULT_LEADERBOARD (already in state)
+        }).catch(() => {
+          setLeaderboard(DEFAULT_LEADERBOARD);
+        });
+      } catch {
+        setLeaderboard(DEFAULT_LEADERBOARD);
+      }
     }
   }, [screen]);
 
@@ -1147,7 +1151,7 @@ export default function AnimeGuesser() {
   useEffect(() => { roundEndedRef.current = false; }, [round]);
 
   const nextRound = () => {
-    if (round >= rounds.length - 1) { setScreen("results"); setTimeout(() => setShowBar(true), 400); return; }
+    if (round >= rounds.length - 1) { setLeaderboard(DEFAULT_LEADERBOARD); setScreen("results"); setTimeout(() => setShowBar(true), 400); return; }
     setPrevRound(round);
     setTransitionPhase("out");
     setTimeout(() => {
@@ -1415,7 +1419,7 @@ export default function AnimeGuesser() {
       <div className="R"><style>{CSS}</style>
         <div className="S S--results">
           {showSaveToast && (
-            <div className="save-toast">✓ NAME SAVED</div>
+            <div className="save-toast"><span className="save-toast-icon" aria-hidden>✓</span> NAME SAVED</div>
           )}
           {showConfetti && (
             <div className="confetti-wrap" style={{position:'fixed',inset:0,pointerEvents:'none',zIndex:50}}>
@@ -1447,10 +1451,11 @@ export default function AnimeGuesser() {
                   </span>
                 )}
               </div>
-              <div className="res-name-input-wrap">
-                <span className="res-name-input-edit-icon" aria-hidden>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                </span>
+              <div className="name-input-wrapper">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CCC" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="name-edit-icon">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
                 <input
                   type="text"
                   className="result-name-input"
