@@ -14,6 +14,7 @@ const ANIME_DB = [
   { mal: 31964, title: "My Hero Academia", accept: ["my hero academia", "bnha", "boku no hero academia", "mha"] },
   { mal: 20, title: "Naruto", accept: ["naruto", "nrt"] },
   { mal: 21, title: "One Piece", accept: ["one piece", "onepiece", "op"] },
+  { mal: 16498, title: "Attack on Titan", accept: ["attack on titan", "shingeki no kyojin", "aot", "snk"] },
 ];
 
 const NUM_ROUNDS = 10;
@@ -95,11 +96,12 @@ function preloadImage(url) {
   });
 }
 
-async function loadAllImages(onProgress) {
+async function loadAllImages(onProgress, onImageFetched) {
   const pool = [];
-  const batchSize = 3;
+  const totalAnime = ANIME_DB.length;
+  const batchSize = 2;
 
-  for (let i = 0; i < ANIME_DB.length; i += batchSize) {
+  for (let i = 0; i < totalAnime; i += batchSize) {
     const batch = ANIME_DB.slice(i, i + batchSize);
     const results = await Promise.all(
       batch.map(a => fetchJikanPics(a.mal).catch(() => []))
@@ -109,21 +111,19 @@ async function loadAllImages(onProgress) {
       const a = batch[j];
       for (const url of urls) {
         pool.push({ image: url, accept: a.accept, hint: a.title });
+        if (onImageFetched) onImageFetched(url);
       }
     });
 
-    onProgress(Math.round(((i + batchSize) / ANIME_DB.length) * 100));
+    const progress = Math.round(((i + batchSize) / totalAnime) * 85);
+    onProgress(Math.min(progress, 85));
 
-    if (pool.length >= 30) {
-      onProgress(100);
-      return pool;
-    }
-
-    if (i + batchSize < ANIME_DB.length) {
-      await new Promise(r => setTimeout(r, 400));
+    if (i + batchSize < totalAnime) {
+      await new Promise(r => setTimeout(r, 600));
     }
   }
 
+  onProgress(90);
   return pool;
 }
 
@@ -305,7 +305,7 @@ html, body, #root {
 .s-loading-text{font-family:Gasoek;text-transform:uppercase;letter-spacing:0.1em;font-size:13px;color:#111;text-align:center}
 .s-loading-pct{font-family:'Bricolage Grotesque';font-size:28px;font-weight:900;color:#111}
 .s-loading-bar{width:280px;height:6px;border-radius:4px;background:#E0E0D8;margin:0 auto;overflow:hidden}
-.s-loading-bar-fill{height:100%;border-radius:4px;background:rgba(200,230,0,1);transition:width 0.4s}
+.s-loading-bar-fill{height:100%;border-radius:4px;background:rgba(200,230,0,1);transition:width 0.4s ease-out}
 .s-loading-tip{font-family:'Bricolage Grotesque';font-size:11px;color:#999;font-style:italic;margin-top:16px}
 @media (min-width:768px){.s-loading-bar{width:280px}}
 
@@ -748,6 +748,7 @@ export default function AnimeGuesser() {
   const [floats, setFloats] = useState([]);
   const [loading, setLoading] = useState(false);
   const [prog, setProg] = useState(0);
+  const [displayProg, setDisplayProg] = useState(0);
   const [showRules, setShowRules] = useState(false);
   const [modalExiting, setModalExiting] = useState(false);
   const inputRef = useRef(null);
@@ -810,7 +811,7 @@ export default function AnimeGuesser() {
     if (titlesToAvoid.length > 0) setPrevGameTitles(titlesToAvoid);
     setIsReplay(replay);
     setRound(0); setTotal(0); setResults([]); setStreak(0); setShowBar(false);
-    setLoading(true); setProg(0); setLoadError("");
+    setLoading(true); setProg(0); setDisplayProg(0); setLoadError("");
     setLoadMsg(replay ? "SUMMONING NEW SCENES..." : "SUMMONING ANIME SCENES...");
     const pool = await loadAllImages((p) => {
       setProg(Math.min(p, 100));
@@ -835,7 +836,13 @@ export default function AnimeGuesser() {
       setLoading(false);
       return;
     }
+    setProg(92);
+    await new Promise(r => setTimeout(r, 200));
     await Promise.all(r.slice(0, 3).map(round => preloadImage(round.image)));
+    setProg(96);
+    await new Promise(r => setTimeout(r, 200));
+    setProg(100);
+    await new Promise(r => setTimeout(r, 300));
     setRounds(r);
     setLoading(false);
     setScreen("playing");
@@ -843,6 +850,17 @@ export default function AnimeGuesser() {
   };
 
   const LOADING_TIPS = ["FEWER TILES = MORE POINTS", "SPEED RUN MODE: ON", "YOU KNOW YOUR ANIME", "REVEAL LESS, SCORE MORE", "IT'S IN THE EYES (AND HAIR)"];
+  useEffect(() => {
+    if (!loading) return;
+    if (prog === 0) {
+      setDisplayProg(0);
+      return;
+    }
+    const id = setInterval(() => {
+      setDisplayProg(prev => Math.min(prev + 2, prog));
+    }, 50);
+    return () => clearInterval(id);
+  }, [loading, prog]);
   useEffect(() => {
     if (!loading) return;
     setLoadingTipIndex(0);
@@ -1042,9 +1060,9 @@ export default function AnimeGuesser() {
               />
             </div>
             <div className="s-loading-text" style={{marginBottom:8}}>{loadMsg}</div>
-            <div className="s-loading-pct" style={{marginBottom:12}}>{prog}%</div>
+            <div className="s-loading-pct" style={{marginBottom:12}}>{displayProg}%</div>
             <div className="s-loading-bar">
-              <div className="s-loading-bar-fill" style={{width:`${prog}%`}}/>
+              <div className="s-loading-bar-fill" style={{width:`${displayProg}%`}}/>
             </div>
             <div className="s-loading-tip">{LOADING_TIPS[loadingTipIndex]}</div>
           </div>
