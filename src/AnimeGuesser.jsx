@@ -99,7 +99,7 @@ function preloadImage(url) {
 async function loadAllImages(onProgress, onImageFetched) {
   const pool = [];
   const totalAnime = ANIME_DB.length;
-  const batchSize = 2;
+  const batchSize = 3;
 
   for (let i = 0; i < totalAnime; i += batchSize) {
     const batch = ANIME_DB.slice(i, i + batchSize);
@@ -119,7 +119,7 @@ async function loadAllImages(onProgress, onImageFetched) {
     onProgress(Math.min(progress, 85));
 
     if (i + batchSize < totalAnime) {
-      await new Promise(r => setTimeout(r, 600));
+      await new Promise(r => setTimeout(r, 350));
     }
   }
 
@@ -305,7 +305,7 @@ html, body, #root {
 .s-loading-text{font-family:Gasoek;text-transform:uppercase;letter-spacing:0.1em;font-size:13px;color:#111;text-align:center}
 .s-loading-pct{font-family:'Bricolage Grotesque';font-size:28px;font-weight:900;color:#111}
 .s-loading-bar{width:280px;height:6px;border-radius:4px;background:#E0E0D8;margin:0 auto;overflow:hidden}
-.s-loading-bar-fill{height:100%;border-radius:4px;background:rgba(200,230,0,1);transition:width 0.4s ease-out}
+.s-loading-bar-fill{height:100%;border-radius:4px;background:rgba(200,230,0,1);transition:width 0.25s ease-out}
 .s-loading-tip{font-family:'Bricolage Grotesque';font-size:11px;color:#999;font-style:italic;margin-top:16px}
 @media (min-width:768px){.s-loading-bar{width:280px}}
 
@@ -837,12 +837,12 @@ export default function AnimeGuesser() {
       return;
     }
     setProg(92);
-    await new Promise(r => setTimeout(r, 200));
+    await new Promise(r => setTimeout(r, 100));
     await Promise.all(r.slice(0, 3).map(round => preloadImage(round.image)));
     setProg(96);
-    await new Promise(r => setTimeout(r, 200));
+    await new Promise(r => setTimeout(r, 100));
     setProg(100);
-    await new Promise(r => setTimeout(r, 300));
+    await new Promise(r => setTimeout(r, 150));
     setRounds(r);
     setLoading(false);
     setScreen("playing");
