@@ -16,6 +16,7 @@ const ANIME_DB = [
   { mal: 20, title: "Naruto", accept: ["naruto", "nrt"] },
   { mal: 21, title: "One Piece", accept: ["one piece", "onepiece", "op"] },
   { mal: 16498, title: "Attack on Titan", accept: ["attack on titan", "shingeki no kyojin", "aot", "snk"] },
+  { mal: 55701, title: "Dandadan", accept: ["dandadan", "dan da dan", "ddd"] },
 ];
 
 const NUM_ROUNDS = 10;
@@ -514,6 +515,12 @@ html, body, #root {
 .res-name-input-wrap .res-name-input-edit-icon svg{display:block;width:14px;height:14px}
 .res-name-input{background:transparent;border:none;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:center;color:#111;padding:0;width:100%;min-width:0;flex:1;outline:none}
 .res-name-input::placeholder{color:#999}
+.result-name-input{background:#FFFFFF;border:2px solid #111;border-radius:12px;font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#111;text-align:center;padding:10px 16px;outline:none;max-width:200px;width:100%;caret-color:#C8E600;transition:border-color 0.2s,box-shadow 0.2s}
+.result-name-input::placeholder{color:#CCC;font-weight:500}
+.result-name-input:focus{border-color:#C8E600;box-shadow:0 0 0 3px rgba(200,230,0,0.25)}
+.save-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#111;color:#C8E600;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.1em;padding:10px 24px;border-radius:9999px;z-index:200;animation:toastIn 0.3s ease,toastOut 0.3s ease 1.7s forwards}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(-10px)}}
 .res-title{font-family:Gasoek;font-size:22px;text-transform:uppercase;color:#111;margin-bottom:8px;padding-bottom:12px}
 .res-score{font-family:'Cabinet Grotesk';font-size:64px;font-weight:900;line-height:1;background:linear-gradient(180deg,#111 0%,#2a2a2a 35%,#444 50%,#2a2a2a 65%,#111 100%);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
 .res-grid{display:grid;grid-template-columns:repeat(5,64px);gap:10px;justify-content:center;margin:20px auto;perspective:400px;position:relative}
@@ -851,6 +858,7 @@ export default function AnimeGuesser() {
   const [avatar, setAvatar] = useState(null);
   const [playerName, setPlayerName] = useState("");
   const [imageSaved, setImageSaved] = useState(false);
+  const [showSaveToast, setShowSaveToast] = useState(false);
   const avatarInputRef = useRef(null);
   const [showRoundsModal, setShowRoundsModal] = useState(false);
   const [leaderboard, setLeaderboard] = useState(DEFAULT_LEADERBOARD);
@@ -901,6 +909,10 @@ export default function AnimeGuesser() {
     initRound();
   };
 
+  useEffect(() => {
+    const saved = localStorage.getItem('aniguess-name');
+    if (saved) setPlayerName(saved);
+  }, []);
   const LOADING_TIPS = ["FEWER TILES = MORE POINTS", "SPEED RUN MODE: ON", "YOU KNOW YOUR ANIME", "REVEAL LESS, SCORE MORE", "IT'S IN THE EYES (AND HAIR)"];
   useEffect(() => {
     if (!loading) return;
@@ -1402,6 +1414,9 @@ export default function AnimeGuesser() {
     return (
       <div className="R"><style>{CSS}</style>
         <div className="S S--results">
+          {showSaveToast && (
+            <div className="save-toast">✓ NAME SAVED</div>
+          )}
           {showConfetti && (
             <div className="confetti-wrap" style={{position:'fixed',inset:0,pointerEvents:'none',zIndex:50}}>
               {confettiPieces.map(p=>(
@@ -1438,10 +1453,18 @@ export default function AnimeGuesser() {
                 </span>
                 <input
                   type="text"
-                  className="res-name-input"
+                  className="result-name-input"
                   placeholder="YOUR NAME, SENPAI"
                   value={playerName}
                   onChange={e => setPlayerName(e.target.value)}
+                  onBlur={() => {
+                    if (playerName.trim()) {
+                      localStorage.setItem('aniguess-name', playerName.trim());
+                      setShowSaveToast(true);
+                      setTimeout(() => setShowSaveToast(false), 2000);
+                    }
+                  }}
+                  maxLength={20}
                 />
               </div>
             </div>
