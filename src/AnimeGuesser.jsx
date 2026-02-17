@@ -323,7 +323,7 @@ html, body, #root {
 @keyframes flip{0%{transform:perspective(120px) scaleX(1)}25%{transform:perspective(120px) scaleX(0)}50%{transform:perspective(120px) scaleX(1)}75%{transform:perspective(120px) scaleX(0)}100%{transform:perspective(120px) scaleX(1)}}
 .loader-card{backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .s-sub{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#666;font-size:16px;font-weight:400;line-height:1.5;text-align:left;width:100%;max-width:360px;margin-top:16px;margin-bottom:32px;text-transform:none;letter-spacing:0;margin-left:auto;margin-right:auto}
-.start-desc{font-family:'Bricolage Grotesque';font-size:14px;line-height:20px;color:#888;max-width:380px;text-transform:none;letter-spacing:0.01em;margin-top:16px;margin-bottom:32px;text-align:left;width:100%}
+.start-desc{font-family:'Bricolage Grotesque';font-size:16px;line-height:20px;color:#888;max-width:380px;text-transform:none;letter-spacing:0.01em;margin-top:16px;margin-bottom:32px;text-align:left;width:100%}
 .s-stats{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:28px;margin-bottom:28px;width:100%}
 .s-stat{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:24px 20px;flex:1;min-width:120px;border:none;border-radius:16px;box-shadow:0 2px 0 rgba(0,0,0,0.15);transition:transform 0.2s ease}
 .s-stat:hover{transform:rotate(0deg)}
@@ -574,6 +574,10 @@ html, body, #root {
   .start-buttons{flex-direction:column;width:100%}
   .start-buttons .btn,.start-buttons .btn-howto{width:100%}
   .title-line2{white-space:normal}
+  .s-stats{gap:8px}
+  .s-stat{padding:16px 8px}
+  .s-stat-v{font-size:24px}
+  .s-stat-l{font-size:9px}
   .B{aspect-ratio:1/1 !important}
 }
 @media (max-width: 400px){
@@ -600,8 +604,12 @@ html, body, #root {
   .start-left{align-items:center}
   .start-title{text-align:center}
   .title-line2{white-space:nowrap}
-  .start-desc{text-align:center}
+  .start-desc{text-align:center;font-size:14px}
   .start-buttons{flex-direction:row;justify-content:center}
+  .s-stats{flex-wrap:nowrap;flex-direction:row;gap:10px;justify-content:center}
+  .s-stat{flex:1;min-width:0;padding:20px 12px}
+  .s-stat-v{font-size:28px}
+  .s-stat-l{font-size:10px;letter-spacing:0.08em}
 }
 @media (min-width: 768px){
   .S{padding:48px}
