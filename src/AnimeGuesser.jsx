@@ -2,18 +2,18 @@ import { useState, useEffect, useCallback, useRef } from "react";
 
 // Anime-only: all entries are MAL anime IDs (TV/movie). Primary image from main anime endpoint (cover); supplemented by /pictures for variety.
 const ANIME_DB = [
-  { mal: 49596, title: "Blue Lock", accept: ["blue lock", "bluelock"] },
+  { mal: 49596, title: "Blue Lock", accept: ["blue lock", "bluelock", "bllk"] },
   { mal: 40748, title: "Jujutsu Kaisen", accept: ["jujutsu kaisen", "jjk"] },
   { mal: 44511, title: "Chainsaw Man", accept: ["chainsaw man", "chainsawman", "csm"] },
-  { mal: 58939, title: "Sakamoto Days", accept: ["sakamoto days", "sakamoto"] },
+  { mal: 58939, title: "Sakamoto Days", accept: ["sakamoto days", "sakamoto", "skdy"] },
   { mal: 41467, title: "Bleach", accept: ["bleach"] },
   { mal: 20583, title: "Haikyu!!", accept: ["haikyu", "haikyuu", "haikyu!!"] },
   { mal: 58811, title: "Tougen Anki", accept: ["tougen anki", "tougenanki"] },
   { mal: 38000, title: "Demon Slayer", accept: ["demon slayer", "kimetsu no yaiba", "kny"] },
   { mal: 52588, title: "Kaiju No. 8", accept: ["kaiju no 8", "kaiju no. 8", "kaiju no.8", "kaiju 8", "kaiju no8"] },
   { mal: 31964, title: "My Hero Academia", accept: ["my hero academia", "bnha", "boku no hero academia", "mha"] },
-  { mal: 20, title: "Naruto", accept: ["naruto"] },
-  { mal: 21, title: "One Piece", accept: ["one piece", "onepiece"] },
+  { mal: 20, title: "Naruto", accept: ["naruto", "nrt"] },
+  { mal: 21, title: "One Piece", accept: ["one piece", "onepiece", "op"] },
 ];
 
 const NUM_ROUNDS = 10;
@@ -136,34 +136,64 @@ function shuffle(arr) {
   return a;
 }
 
-function buildRoundsFromPool(pool) {
+function buildRoundsFromPool(pool, avoidTitles = []) {
   if (pool.length < NUM_ROUNDS) return null;
+
   const shuffled = shuffle(pool);
   const rounds = [];
-  const usedTitles = new Set();
+  const titleCount = {};
   const usedImages = new Set();
+  const avoidSet = new Set(avoidTitles);
 
-  // Pass 1: one image per anime (all unique anime)
+  // Pass 1: Pick unique anime that weren't in the last game
   for (const r of shuffled) {
     if (rounds.length >= NUM_ROUNDS) break;
-    if (usedTitles.has(r.hint) || usedImages.has(r.image)) continue;
+    if (usedImages.has(r.image)) continue;
+    if (titleCount[r.hint]) continue;
+    if (avoidSet.has(r.hint)) continue;
     rounds.push(r);
-    usedTitles.add(r.hint);
     usedImages.add(r.image);
+    titleCount[r.hint] = 1;
   }
 
-  // Pass 2: if not enough, allow same anime but different image
+  // Pass 2: If not enough, allow anime from last game but still unique titles
   if (rounds.length < NUM_ROUNDS) {
     for (const r of shuffled) {
       if (rounds.length >= NUM_ROUNDS) break;
       if (usedImages.has(r.image)) continue;
+      if (titleCount[r.hint]) continue;
       rounds.push(r);
       usedImages.add(r.image);
+      titleCount[r.hint] = 1;
     }
   }
 
-  // Final shuffle so order is random
-  return shuffle(rounds).slice(0, NUM_ROUNDS);
+  // Pass 3: If still not enough, allow max 2 per anime
+  if (rounds.length < NUM_ROUNDS) {
+    for (const r of shuffled) {
+      if (rounds.length >= NUM_ROUNDS) break;
+      if (usedImages.has(r.image)) continue;
+      if ((titleCount[r.hint] || 0) >= 2) continue;
+      rounds.push(r);
+      usedImages.add(r.image);
+      titleCount[r.hint] = (titleCount[r.hint] || 0) + 1;
+    }
+  }
+
+  // Pass 4: Rearrange to prevent consecutive same anime
+  const arranged = [];
+  const remaining = [...rounds];
+  let lastTitle = null;
+
+  while (remaining.length > 0) {
+    let foundIndex = remaining.findIndex(r => r.hint !== lastTitle);
+    if (foundIndex === -1) foundIndex = 0;
+    arranged.push(remaining[foundIndex]);
+    lastTitle = remaining[foundIndex].hint;
+    remaining.splice(foundIndex, 1);
+  }
+
+  return arranged;
 }
 
 const WRONG = [
@@ -293,6 +323,7 @@ html, body, #root {
 @keyframes flip{0%{transform:perspective(120px) scaleX(1)}25%{transform:perspective(120px) scaleX(0)}50%{transform:perspective(120px) scaleX(1)}75%{transform:perspective(120px) scaleX(0)}100%{transform:perspective(120px) scaleX(1)}}
 .loader-card{backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .s-sub{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#666;font-size:16px;font-weight:400;line-height:1.5;text-align:left;width:100%;max-width:360px;margin-top:16px;margin-bottom:32px;text-transform:none;letter-spacing:0;margin-left:auto;margin-right:auto}
+.start-desc{font-family:'Bricolage Grotesque';font-size:14px;line-height:20px;color:#888;max-width:380px;text-transform:none;letter-spacing:0.01em;margin-top:16px;margin-bottom:32px;text-align:left;width:100%}
 .s-stats{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:28px;margin-bottom:28px;width:100%}
 .s-stat{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:24px 20px;flex:1;min-width:120px;border:none;border-radius:16px;box-shadow:0 2px 0 rgba(0,0,0,0.15);transition:transform 0.2s ease}
 .s-stat:hover{transform:rotate(0deg)}
@@ -332,6 +363,9 @@ html, body, #root {
 .btn-shimmer:focus,.btn-shimmer:focus-visible{outline:2px solid #A8C200;outline-offset:2px}
 .btn-shimmer:hover .btn-shimmer-fill{background:rgba(220, 242, 74, 1)}
 .btn-go-inner{transition:background 0.2s ease}
+.start-buttons{display:flex;flex-direction:row;gap:10px}
+.start-buttons .btn{padding:14px 28px;font-size:13px;min-width:160px}
+.start-buttons .btn-go,.start-buttons .btn-howto{padding:14px 28px;font-size:13px;min-width:160px;width:auto;max-width:none}
 .btn-howto-wrap{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .btn-howto-wrap .btn-go,.btn-howto-wrap .btn-howto{width:230px;min-width:230px;max-width:230px;box-sizing:border-box;padding:16px 56px;font-size:14px;white-space:nowrap}
 .btn-howto{background:transparent;border:1.5px solid #111;border-radius:9999px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#111;cursor:pointer;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:background 0.2s,color 0.2s,border-color 0.2s,transform 0.2s ease,box-shadow 0.2s ease}
@@ -537,6 +571,9 @@ html, body, #root {
   .res-block{width:56px;height:56px}
 }
 @media (max-width: 480px){
+  .start-buttons{flex-direction:column;width:100%}
+  .start-buttons .btn,.start-buttons .btn-howto{width:100%}
+  .title-line2{white-space:normal}
   .B{aspect-ratio:1/1 !important}
 }
 @media (max-width: 400px){
@@ -547,21 +584,30 @@ html, body, #root {
 @media (max-width: 639px){
   .s-hero{margin-top:56px}
   .s-hero-left{align-items:center;text-align:center}
-  .s-hero-left .s-t,.s-hero-left .s-sub{text-align:center}
+  .s-hero-left .s-t,.s-hero-left .s-sub,.s-hero-left .start-desc{text-align:center}
   .s-hero-left .btn-howto-wrap{align-items:center}
 }
 
 @media (min-width: 640px){
   .s-hero{flex-direction:row;gap:80px;align-items:flex-start;text-align:left;max-width:960px;width:90%;margin-left:auto;margin-right:auto}
   .s-hero-left{display:flex;flex-direction:column;align-items:flex-start;text-align:left;flex:1;min-width:0;width:auto}
-  .s-hero-left .s-t,.s-hero-left .s-sub,.s-hero-left .btn-howto-wrap{width:100%;max-width:100%}
-  .s-hero-left .s-sub{margin-left:0;margin-right:0}
+  .s-hero-left .s-t,.s-hero-left .s-sub,.s-hero-left .start-desc,.s-hero-left .btn-howto-wrap{width:100%;max-width:100%}
+  .s-hero-left .s-sub,.s-hero-left .start-desc{margin-left:0;margin-right:0}
   .s-hero-right{display:flex;flex-direction:column;align-items:center;flex:1;min-width:0;width:auto}
+}
+@media (max-width: 1023px){
+  .start-content{flex-direction:column;align-items:center;text-align:center;gap:32px}
+  .start-left{align-items:center}
+  .start-title{text-align:center}
+  .title-line2{white-space:nowrap}
+  .start-desc{text-align:center}
+  .start-buttons{flex-direction:row;justify-content:center}
 }
 @media (min-width: 768px){
   .S{padding:48px}
   .P{padding:12px 16px}
   .s-t{font-size:68px;letter-spacing:0.05em}
+  .start-title{font-size:64px;line-height:1.05}
   .s-sub{max-width:360px;font-size:16px}
   .s-stats{gap:12px;margin-bottom:28px}
   .s-stat{padding:24px 20px;border-radius:16px;flex:1;min-width:120px}
@@ -583,6 +629,9 @@ html, body, #root {
 }
 
 @media (min-width: 1024px){
+  .start-content{flex-direction:row;align-items:center;gap:80px}
+  .start-left{align-items:flex-start;text-align:left}
+  .start-buttons{flex-direction:row}
   .H{max-width:100%}
   .B{max-width:100%;aspect-ratio:16/8}
   .res{max-width:100%}
@@ -596,8 +645,10 @@ html, body, #root {
   .s-hero{max-width:1100px;gap:100px}
   .s-t{font-size:56px;line-height:1.05;letter-spacing:0.02em;max-width:12ch}
   .s-sub{font-size:18px;line-height:1.55;max-width:420px}
+  .start-desc{font-size:16px}
   .btn-go{padding:18px 60px;font-size:16px;transition:all 0.2s ease}
   .btn-howto-wrap .btn-go,.btn-howto-wrap .btn-howto{width:250px;min-width:250px;max-width:250px;padding:18px 60px;font-size:16px}
+  .start-buttons .btn-go,.start-buttons .btn-howto{min-width:160px;width:auto;max-width:none;padding:14px 28px;font-size:13px}
   .s-stats{gap:14px}
   .s-stat{padding:28px 32px;min-width:160px}
   .s-stat-v{font-size:44px}
@@ -701,6 +752,7 @@ export default function AnimeGuesser() {
   const [showLandingConfetti, setShowLandingConfetti] = useState(false);
   const [landingConfettiPieces, setLandingConfettiPieces] = useState([]);
   const landingConfettiShownRef = useRef(false);
+  const [prevGameTitles, setPrevGameTitles] = useState([]);
   const [isShaking, setIsShaking] = useState(false);
   const [boardPulse, setBoardPulse] = useState(false);
   const [displayScore, setDisplayScore] = useState(0);
@@ -746,21 +798,22 @@ export default function AnimeGuesser() {
 
   const startGame = async () => {
     const replay = screen === "results" || screen === "playing";
+    const titlesToAvoid = rounds && rounds.length > 0 ? rounds.map(r => r.hint) : [];
+    if (titlesToAvoid.length > 0) setPrevGameTitles(titlesToAvoid);
     setIsReplay(replay);
     setRound(0); setTotal(0); setResults([]); setStreak(0); setShowBar(false);
     setLoading(true); setProg(0); setLoadError("");
-    setLoadMsg(replay ? "Loading new round..." : "FETCHING ANIME SCENES...");
+    setLoadMsg(replay ? "SUMMONING NEW SCENES..." : "SUMMONING ANIME SCENES...");
     const pool = await loadAllImages((p) => {
       setProg(Math.min(p, 100));
       if (replay) {
-        if (p < 40) setLoadMsg("Loading new round...");
-        else if (p < 80) setLoadMsg("Shuffling anime...");
-        else setLoadMsg("Get ready...");
+        if (p < 40) setLoadMsg("SUMMONING NEW SCENES...");
+        else if (p < 80) setLoadMsg("PLOT ARMOR ACTIVATED...");
+        else setLoadMsg("FINAL FORM UNLOCKED");
       } else {
-        if (p < 30) setLoadMsg("SUMMONING ANIME SCENES...");
-        else if (p < 60) setLoadMsg("DECODING EPISODE FRAMES...");
-        else if (p < 90) setLoadMsg("ALMOST THERE...");
-        else setLoadMsg("ASSEMBLING ROUNDS...");
+        if (p < 40) setLoadMsg("SUMMONING ANIME SCENES...");
+        else if (p < 80) setLoadMsg("LOADING FILLER ARC...");
+        else setLoadMsg("OMAE WA MOU READY");
       }
     });
     if (pool.length === 0) {
@@ -768,7 +821,7 @@ export default function AnimeGuesser() {
       setLoading(false);
       return;
     }
-    const r = buildRoundsFromPool(pool);
+    const r = buildRoundsFromPool(pool, titlesToAvoid);
     if (!r) {
       setLoadError(`Only got ${pool.length} images. Need at least ${NUM_ROUNDS}. Try again.`);
       setLoading(false);
@@ -1031,12 +1084,12 @@ export default function AnimeGuesser() {
         <div className="s-logo-wrap s-z">
           <img src="/textmarklogo-aniguess.svg" alt="ANIGUESS°" style={{ height: 36, width: 'auto' }} />
         </div>
-        <div className="s-hero s-z">
-          <div className="s-hero-left">
+        <div className="s-hero s-z start-content">
+          <div className="s-hero-left start-left">
             <div className="logo-mark" aria-hidden />
-            <h1 className="s-t"><span className="shiny-text">Guess the Anime</span></h1>
-            <p className="s-sub">Reveal tiles from hidden anime images and name the anime before time runs out.</p>
-            <div className="btn-howto-wrap">
+            <h1 className="s-t start-title"><span className="shiny-text">GUESS<br />THE ANIME</span></h1>
+            <p className="start-desc">Reveal tiles from hidden anime images<br />and name the anime before time runs out.</p>
+            <div className="btn-howto-wrap start-buttons">
               <button className="btn btn-go btn-shimmer" onClick={startGame} style={{'--spread':'90deg','--shimmer-color':'#EAFF60','--radius':'9999px','--speed':'3s','--cut':'0.05em','--bg':'rgba(220, 242, 74, 1)'}}>
                 <div className="btn-shimmer-edge">
                   <div className="btn-shimmer-spark" />
