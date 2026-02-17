@@ -458,6 +458,7 @@ html, body, #root {
 }
 
 @media (max-width: 639px){
+  .s-hero{margin-top:56px}
   .s-hero-left{align-items:center;text-align:center}
   .s-hero-left .s-t,.s-hero-left .s-sub{text-align:center}
   .s-hero-left .btn-howto-wrap{align-items:center}
