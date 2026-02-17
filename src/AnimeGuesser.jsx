@@ -159,20 +159,26 @@ function genConfetti() {
   }));
 }
 
-function calcScore(tilesRevealed, timeLeft, totalTime, totalTiles) {
-  // Base score: starts at 1000, loses points per tile opened
-  const tilesPenalty = (tilesRevealed / totalTiles) * 700;
-  const baseScore = Math.max(1000 - tilesPenalty, 100);
+const LANDING_CONFETTI_COLORS = ["#DEFF0A", "#B8D900", "#9AE600", "#22c55e", "#16a34a", "#15803d"];
+function genLandingConfetti() {
+  return Array.from({ length: 32 }, (_, i) => ({
+    id: `land-${i}`,
+    color: LANDING_CONFETTI_COLORS[i % LANDING_CONFETTI_COLORS.length],
+    left: 5 + Math.random() * 90,
+    tx: (Math.random() - 0.5) * 120,
+    ty: 95 + Math.random() * 25,
+    rot: (Math.random() - 0.5) * 720,
+    delay: Math.random() * 0.4,
+    duration: 2 + Math.random() * 0.8,
+  }));
+}
 
-  // Time bonus: up to 200 extra points for fast answers
-  const timeRatio = timeLeft / totalTime;
-  const timeBonus = Math.round(timeRatio * 200);
+function calcScore(tilesRevealed, timeLeft, totalTime) {
+  const tileFactor = Math.max(0, 1 - (tilesRevealed - 1) / 23);
+  const timeFactor = timeLeft / totalTime;
 
-  // Early guess bonus: bonus for guessing with fewer tiles
-  const earlyBonus = Math.max(0, Math.round((1 - tilesRevealed / 6) * 100));
-
-  const total = Math.round(baseScore + timeBonus + earlyBonus);
-  return Math.min(total, 1300);
+  const score = Math.round(tileFactor * 750 + timeFactor * 200 + 50);
+  return Math.min(score, 1000); // Hard cap at 1000
 }
 
 function getRank(p) {
@@ -217,15 +223,20 @@ html, body, #root {
   src:url('/fonts/Gasoek-Heavy.ttf') format('truetype');
   font-weight:400;font-style:normal;font-display:swap;
 }
+@font-face{
+  font-family:'Bricolage Grotesque';
+  src:url('/fonts/BricolageGrotesque-Variable.ttf') format('truetype');
+  font-weight:100 900;font-style:normal;font-display:swap;
+}
 .R{width:100%;min-width:100%;min-height:100vh;max-width:100vw;font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;background:#F5F5F0;color:var(--t);position:relative;overflow-x:hidden;border-top:3px solid #DEFF0A}
 .R,.R *{cursor:url('/pochita-cursor.png') 16 16,auto !important}
 
 .s-loading{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center}
-.s-loading-text{font-family:'Space Mono','Courier New','Courier',monospace;text-transform:uppercase;letter-spacing:0.1em;font-size:13px;color:#111;text-align:center}
-.s-loading-pct{font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;font-size:28px;font-weight:900;color:#111}
+.s-loading-text{font-family:Gasoek;text-transform:uppercase;letter-spacing:0.1em;font-size:13px;color:#111;text-align:center}
+.s-loading-pct{font-family:'Bricolage Grotesque';font-size:28px;font-weight:900;color:#111}
 .s-loading-bar{width:280px;height:6px;border-radius:4px;background:#E0E0D8;margin:0 auto;overflow:hidden}
 .s-loading-bar-fill{height:100%;border-radius:4px;background:rgba(200,230,0,1);transition:width 0.4s}
-.s-loading-tip{font-size:11px;color:#999;font-style:italic;margin-top:16px}
+.s-loading-tip{font-family:'Bricolage Grotesque';font-size:11px;color:#999;font-style:italic;margin-top:16px}
 @media (min-width:768px){.s-loading-bar{width:280px}}
 
 .S{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;width:100%;max-width:1200px;margin-left:auto;margin-right:auto;box-sizing:border-box;position:relative;z-index:1}
@@ -241,7 +252,7 @@ html, body, #root {
 @keyframes spin-around{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 @keyframes flip{0%{transform:perspective(120px) scaleX(1)}25%{transform:perspective(120px) scaleX(0)}50%{transform:perspective(120px) scaleX(1)}75%{transform:perspective(120px) scaleX(0)}100%{transform:perspective(120px) scaleX(1)}}
 .loader-card{backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.s-sub{font-family:'SF Pro Rounded',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#666;font-size:16px;font-weight:400;line-height:1.5;text-align:left;width:100%;max-width:360px;margin-top:16px;margin-bottom:32px;text-transform:none;letter-spacing:0;margin-left:auto;margin-right:auto}
+.s-sub{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#666;font-size:16px;font-weight:400;line-height:1.5;text-align:left;width:100%;max-width:360px;margin-top:16px;margin-bottom:32px;text-transform:none;letter-spacing:0;margin-left:auto;margin-right:auto}
 .s-stats{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:28px;margin-bottom:28px;width:100%}
 .s-stat{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:24px 20px;flex:1;min-width:120px;border:none;border-radius:16px;box-shadow:0 2px 0 rgba(0,0,0,0.15);transition:transform 0.2s ease}
 .s-stat:hover{transform:rotate(0deg)}
@@ -255,19 +266,19 @@ html, body, #root {
 .s-stat--r2{transform:rotate(1deg)}
 .s-stat--r3{transform:rotate(-1.5deg)}
 .s-stat-v{font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;font-size:36px;font-weight:900}
-.s-stat-l{font-family:'Space Mono','Courier New','Courier',monospace;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;opacity:0.7}
-.s-stats-line{font-family:'Space Mono','Courier New','Courier',monospace;font-size:11px;font-weight:400;color:var(--t2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:24px}
+.s-stat-l{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;opacity:0.7}
+.s-stats-line{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;font-weight:400;color:var(--t2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:24px}
 .s-rules{display:flex;flex-direction:column;width:100%;max-width:300px;list-style:none;margin:0;padding:0}
-.s-rule{display:flex;align-items:flex-start;gap:12px;font-family:'Space Mono','Courier New','Courier',monospace;font-size:12px;font-weight:500;color:#555;margin-bottom:8px;text-transform:none;letter-spacing:0}
+.s-rule{display:flex;align-items:flex-start;gap:12px;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;font-weight:500;color:#555;margin-bottom:8px;text-transform:none;letter-spacing:0}
 .s-rule-n{font-weight:900;color:var(--t);flex-shrink:0}
-.s-api{font-family:'Space Mono','Courier New','Courier',monospace;font-size:11px;color:#999;padding-top:16px;border-top:1px solid #ccc;width:100%;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;margin:24px 0 16px;text-align:center}
+.s-api{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:#999;padding-top:16px;border-top:1px solid #ccc;width:100%;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;margin:24px 0 16px;text-align:center}
 
 .s-hero{display:flex;flex-direction:column;align-items:center;text-align:center;width:90%;max-width:960px;margin-left:auto;margin-right:auto;flex-wrap:nowrap}
 .s-hero-left{display:flex;flex-direction:column;align-items:flex-start;text-align:left;width:100%;flex-shrink:0}
 .s-hero-right{display:flex;flex-direction:column;align-items:center;width:100%;flex-shrink:0}
 
-.btn{font-family:'Space Mono','Courier New','Courier',monospace;font-weight:700;cursor:pointer;border:none;transition:background 0.15s,color 0.15s,border-color 0.15s}
-.btn-go{width:100%;padding:16px 56px;font-size:14px;font-weight:800;color:#111;background:#DEFF0A;border:none;border-radius:9999px;text-transform:uppercase;letter-spacing:0.1em;transition:background 0.2s ease,color 0.2s ease}
+.btn{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:600;cursor:pointer;border:none;transition:background 0.15s,color 0.15s,border-color 0.15s}
+.btn-go{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;width:100%;padding:16px 56px;font-size:14px;font-weight:600;color:#111;background:#DEFF0A;border:none;border-radius:9999px;text-transform:uppercase;letter-spacing:0.1em;transition:background 0.2s ease,color 0.2s ease}
 .btn-go:hover{background:#111;color:#DEFF0A}
 .btn-go:active{opacity:0.9}
 .btn-shimmer{position:relative;z-index:0;overflow:hidden;background:var(--bg,#DEFF0A) !important;border:2px solid #A8C200}
@@ -283,7 +294,7 @@ html, body, #root {
 .btn-go-inner{transition:background 0.2s ease}
 .btn-howto-wrap{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .btn-howto-wrap .btn-go,.btn-howto-wrap .btn-howto{width:230px;min-width:230px;max-width:230px;box-sizing:border-box;padding:16px 56px;font-size:14px;white-space:nowrap}
-.btn-howto{background:transparent;border:1.5px solid #111;border-radius:9999px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#111;cursor:pointer;font-family:'Space Mono','Courier New','Courier',monospace;transition:background 0.2s,color 0.2s,border-color 0.2s,transform 0.2s ease,box-shadow 0.2s ease}
+.btn-howto{background:transparent;border:1.5px solid #111;border-radius:9999px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#111;cursor:pointer;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:background 0.2s,color 0.2s,border-color 0.2s,transform 0.2s ease,box-shadow 0.2s ease}
 .btn-howto:hover{background:#E5E5E0;color:#111;border-color:#333;transform:scale(1.04);box-shadow:0 4px 16px rgba(0,0,0,0.08)}
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .modal-backdrop.modal-exit{animation:modalBackdropOut 0.3s cubic-bezier(0.4,0,0.2,1) forwards}
@@ -297,12 +308,12 @@ html, body, #root {
 .modal-rule:last-of-type{margin-bottom:0}
 .modal-rule-badge{width:32px;height:32px;border-radius:50%;background:#DEFF0A;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#111;flex-shrink:0}
 .modal-rule-text{font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;font-size:15px;color:#333;font-weight:500}
-.modal-score-note{font-size:12px;color:#999;font-family:'Space Mono','Courier New','Courier',monospace;margin-top:20px;text-transform:uppercase;letter-spacing:0.05em}
+.modal-score-note{font-size:12px;color:#999;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin-top:20px;text-transform:uppercase;letter-spacing:0.05em}
 .modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;min-width:32px;min-height:32px;padding:0;border-radius:50%;aspect-ratio:1;background:#111;color:#F5F5F0;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-sizing:border-box;flex-shrink:0}
 .modal-close .modal-close-icon{display:flex;align-items:center;justify-content:center;width:100%;height:100%;line-height:0;pointer-events:none}
 .modal-close:hover{opacity:0.9}
 .btn-nxt{width:100%;max-width:100%;padding:14px 32px;font-size:12px;color:#FFF;background:#111;border-radius:9999px;text-transform:uppercase;letter-spacing:0.1em}
-.btn-pill{font-family:'Space Mono','Courier New','Courier',monospace;padding:6px 18px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;background:transparent;border:1.5px solid #111;border-radius:9999px;color:var(--t);cursor:pointer}
+.btn-pill{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:6px 18px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;background:transparent;border:1.5px solid #111;border-radius:9999px;color:var(--t);cursor:pointer}
 .btn-pill:hover{background:#FFF;border-color:#111}
 .btn-pill.active{background:#111;color:#FFF}
 
@@ -323,14 +334,14 @@ html, body, #root {
 .H{width:100%;margin-bottom:0;padding:12px 16px;background:var(--card);border:1px solid var(--b);border-radius:4px;flex-shrink:0}
 .H-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:0;margin-top:0;padding-bottom:8px;flex-wrap:wrap;gap:8px;box-sizing:content-box}
 .H-l{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.rnd{font-family:'Space Mono','Courier New','Courier',monospace;padding:4px 8px;background:transparent;border:1px solid var(--b);border-radius:4px;font-size:9px;font-weight:700;color:var(--t);text-transform:uppercase;letter-spacing:0.1em}
+.rnd{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:4px 8px;background:transparent;border:1px solid var(--b);border-radius:4px;font-size:9px;font-weight:700;color:var(--t);text-transform:uppercase;letter-spacing:0.1em}
 .dots{display:flex;gap:3px;align-items:center}
-.dot{width:5px;height:5px;border-radius:0;background:var(--t);transition:background 0.2s}
-.H-sc{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;padding:4px 10px;height:44px;box-sizing:border-box;border-radius:8px;background:rgba(255,255,255,0.5);border:1px solid rgba(0,0,0,0.04);box-shadow:none}
-.H-sc-l{font-family:'Space Mono','Courier New','Courier',monospace;font-size:9px;color:var(--t);font-weight:700;text-transform:uppercase;letter-spacing:0.12em}
-.H-sc-n{font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;font-size:18px;font-weight:900;color:#444}
-.H-sc-pts{font-size:16px;font-weight:700;color:rgba(68,68,68,0.5);margin-left:2px}
-.H-streak{font-family:'Space Mono','Courier New','Courier',monospace;font-size:16px;font-weight:900;color:#c45a2a}
+.dot{width:7px;height:7px;border-radius:2px;background:var(--t);transition:background 0.2s}
+.H-sc{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;padding:4px 10px;height:44px;box-sizing:border-box;border-radius:8px;background:rgba(255,255,255,0.5);border:1px solid rgba(0,0,0,0.04);box-shadow:none}
+.H-sc-l{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:9px;color:var(--t);font-weight:700;text-transform:uppercase;letter-spacing:0.12em}
+.H-sc-n{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:18px;font-weight:900;color:#111}
+.H-sc-pts{font-size:16px;font-weight:700;color:#111;margin-left:2px}
+.H-streak{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;font-weight:900;color:#c45a2a}
 .H-streak.H-streak--zero{color:#bbb}
 .H-divider{color:#bbb;font-weight:400;user-select:none}
 .flame{width:20px;height:24px;background:radial-gradient(ellipse at 50% 90%,#FF6B35 0%,#FFB800 40%,#DEFF0A 75%,transparent 100%);border-radius:50% 50% 50% 50%/60% 60% 40% 40%;position:relative;flex-shrink:0;filter:drop-shadow(0 4px 8px rgba(255,107,53,0.4))}
@@ -340,15 +351,15 @@ html, body, #root {
 .flame.flame--hype{animation:flameHype 0.6s ease-in-out infinite;transform:scale(1.2);box-shadow:0 0 16px rgba(255,184,0,0.5)}
 @keyframes flamePulse{0%,100%{opacity:1;transform:scale(1.1)}50%{opacity:0.85;transform:scale(1.15)}}
 @keyframes flameHype{0%,100%{opacity:1;transform:scale(1.2)}50%{opacity:0.9;transform:scale(1.25)}}
-.strk{font-family:'Space Mono','Courier New','Courier',monospace;padding:4px 8px;font-size:9px;font-weight:700;background:var(--accent);color:var(--t);border:1px solid var(--b);border-radius:9999px;text-transform:uppercase;letter-spacing:0.08em}
+.strk{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:4px 8px;font-size:9px;font-weight:700;background:var(--accent);color:var(--t);border:1px solid var(--b);border-radius:9999px;text-transform:uppercase;letter-spacing:0.08em}
 
 .Tw{position:relative;width:100%;height:4px;border-radius:2px;background:#ddd;overflow:hidden}
 .Tf{height:100%;border-radius:2px;transition:width 1s linear,background 0.3s ease;background:#111}
 .Tf.timer-bar-orange{background:#FF6B35}
 .Tf.timer-bar-urgent{background:#FF4444}
 .Tm{display:flex;justify-content:space-between;margin-top:4px;align-items:center}
-.Ts{font-family:'Space Mono','Courier New','Courier',monospace;font-size:14px;font-weight:700;color:var(--t)}
-.Ti{font-family:'Space Mono','Courier New','Courier',monospace;font-size:9px;color:var(--t2);font-weight:500;text-transform:uppercase;letter-spacing:0.06em}
+.Ts{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:700;color:var(--t)}
+.Ti{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:9px;color:var(--t2);font-weight:500;text-transform:uppercase;letter-spacing:0.06em}
 .Ti em{font-style:normal;font-weight:700;color:var(--t)}
 
 .board-wrap{flex:1;min-height:0;display:flex;flex-direction:column;min-height:0}
@@ -357,41 +368,41 @@ html, body, #root {
 .B img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;visibility:hidden}
 .B.vis img{visibility:visible}
 .G{position:absolute;inset:0;z-index:1;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(4,1fr);gap:0;grid-gap:0;padding:0;perspective:400px}
-.tile{display:flex;align-items:center;justify-content:center;user-select:none;cursor:pointer;width:100%;height:100%;margin:0;padding:0;background:#E8E8E2;border:none;outline:none;box-shadow:inset 0 0 0 0.5px rgba(0,0,0,0.08);position:relative;transform-style:preserve-3d}
+.tile{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;align-items:center;justify-content:center;user-select:none;cursor:pointer;width:100%;height:100%;margin:0;padding:0;background:#E8E8E2;border:none;outline:none;box-shadow:inset 0 0 0 0.5px rgba(0,0,0,0.08);position:relative;transform-style:preserve-3d}
 .tile:hover:not(.X){background:#e0e0da}
 .tile:active:not(.X){opacity:0.9}
 .tile.X{background:transparent;box-shadow:none;outline:none;opacity:0;pointer-events:none;cursor:default}
-.tn{font-family:'Space Mono','Courier New','Courier',monospace;font-size:10px;font-weight:400;color:#999;position:relative;z-index:1}
-.B-meta{font-family:'Space Mono','Courier New','Courier',monospace;display:flex;justify-content:space-between;font-size:11px;font-weight:500;color:#bbb;margin-top:8px;text-transform:uppercase;letter-spacing:0.1em}
+.tn{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:10px;font-weight:400;color:#999;position:relative;z-index:1}
+.B-meta{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:flex;justify-content:space-between;font-size:11px;font-weight:500;color:#bbb;margin-top:8px;text-transform:uppercase;letter-spacing:0.1em}
 
 .res{width:100%;max-width:100%;text-align:center;padding:12px 0 8px;flex-shrink:0;user-select:none}
 .res-e{font-size:32px;margin-bottom:8px;color:var(--t)}
-.res-l{font-family:'Space Mono','Courier New','Courier',monospace;font-size:14px;font-weight:700;color:var(--t);text-transform:uppercase;letter-spacing:0.12em}
+.res-l{font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:700;color:var(--t);text-transform:uppercase;letter-spacing:0.12em}
 .res-l--correct{color:#111;font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;font-size:32px;font-weight:900}
 .res-p{font-size:14px;font-weight:700;color:var(--t);margin-top:4px}
-.res-p.score-flash{color:#111;font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;font-size:40px;font-weight:900;margin-top:0}
+.res-p.score-flash{color:#111;font-family:Gasoek;font-size:40px;font-weight:900;margin-top:0}
 .res--correct .res-e{margin-bottom:4px}
-.res-sp{font-family:'Space Mono','Courier New','Courier',monospace;display:inline-block;padding:6px 12px;border:1px solid var(--b);border-radius:9999px;font-size:10px;font-weight:700;color:var(--t);margin-top:12px;text-transform:uppercase;letter-spacing:0.1em}
-.res-miss{font-family:'Space Mono','Courier New','Courier',monospace;font-size:12px;color:var(--t2);margin-top:8px;text-transform:uppercase}
+.res-sp{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;display:inline-block;padding:6px 12px;border:1px solid var(--b);border-radius:9999px;font-size:10px;font-weight:700;color:var(--t);margin-top:12px;text-transform:uppercase;letter-spacing:0.1em}
+.res-miss{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;color:var(--t2);margin-top:8px;text-transform:uppercase}
 .res-miss strong{color:var(--t);font-weight:700}
 
 .I{width:100%;margin-top:10px;flex-shrink:0;display:flex;flex-direction:column;align-items:stretch;position:relative;z-index:5}
 .input-row{display:flex;flex-direction:column;gap:8px;width:100%;align-items:stretch}
 .input-row-actions{display:flex;gap:8px;align-items:center;width:100%}
 .input-row-actions .btn-confirm{flex:1;min-width:0}
-.game-input{flex:1;min-width:0;padding:12px 16px;font-family:'Space Mono','Courier New','Courier',monospace;font-size:15px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#111;background:#FFFFFF;border:1.5px solid #111;border-image:none;border-radius:12px;outline:none;caret-color:#111;transition:border-color 0.2s,box-shadow 0.2s}
+.game-input{flex:1;min-width:0;padding:12px 16px;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#111;background:#FFFFFF;border:1.5px solid #111;border-image:none;border-radius:12px;outline:none;caret-color:#111;transition:border-color 0.2s,box-shadow 0.2s}
 .game-input::placeholder{color:#999;font-weight:500}
 .game-input:focus{border-color:rgba(200,230,0,0.71);box-shadow:0 0 0 3px rgba(0,0,0,0.08)}
 .game-input.error{border-color:#FF3333;box-shadow:0 0 0 3px rgba(255,51,51,0.15);animation:inputShake 0.4s ease}
-.btn-confirm{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;font-family:'Space Mono','Courier New','Courier',monospace;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#F5F5F0;background:#111;border:2px solid #111;border-radius:12px;cursor:pointer;transition:all 0.15s ease;white-space:nowrap;flex-shrink:0}
+.btn-confirm{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#F5F5F0;background:#111;border:2px solid #111;border-radius:12px;cursor:pointer;transition:all 0.15s ease;white-space:nowrap;flex-shrink:0}
 .btn-confirm:hover{background:rgba(200,230,0,1);color:#111;border-color:#111}
 .btn-confirm:active{transform:translateY(2px)}
-.btn-giveup-ghost{display:flex;align-items:center;justify-content:center;gap:6px;min-width:52px;height:52px;padding:0 14px;box-sizing:border-box;background:transparent;border:1.5px solid #333;border-radius:12px;cursor:pointer;color:#555;transition:all 0.2s ease;flex-shrink:0;position:relative;z-index:5;font-family:'Space Mono','Courier New','Courier',monospace;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em}
+.btn-giveup-ghost{display:flex;align-items:center;justify-content:center;gap:6px;min-width:52px;height:52px;padding:0 14px;box-sizing:border-box;background:transparent;border:1.5px solid #333;border-radius:12px;cursor:pointer;color:#555;transition:all 0.2s ease;flex-shrink:0;position:relative;z-index:5;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em}
 .btn-giveup-ghost:hover{border-color:#FF3333;color:#FF3333;background:rgba(255,51,51,0.04)}
 .btn-giveup-ghost:active{transform:translateY(1px)}
-.wrong-toast{text-align:center;margin-top:8px;padding:8px 16px;border-radius:8px;background:rgba(255,51,51,0.08);border:1px solid rgba(255,51,51,0.15);color:#FF3333;font-family:'Space Mono','Courier New','Courier',monospace;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;animation:popIn 0.25s ease}
+.wrong-toast{text-align:center;margin-top:8px;padding:8px 16px;border-radius:8px;background:rgba(255,51,51,0.08);border:1px solid rgba(255,51,51,0.15);color:#FF3333;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;animation:popIn 0.25s ease}
 .wrong-toast.toast-enter{animation:toastSlideUp 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards}
-.ht{font-family:'Space Mono','Courier New','Courier',monospace;text-align:center;font-size:10px;color:#ccc;margin-top:6px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em}
+.ht{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-align:center;font-size:10px;color:#ccc;margin-top:6px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em}
 
 .S--results{min-height:100vh;max-height:100vh;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden}
 .S--results .res-wrap{flex:1;min-height:0;overflow-y:auto;padding-bottom:120px}
@@ -408,11 +419,11 @@ html, body, #root {
 .res-name-input-wrap .res-name-input-edit-icon{flex-shrink:0;color:#999;transition:color 0.2s ease;display:flex;align-items:center;justify-content:center}
 .res-name-input-wrap:focus-within .res-name-input-edit-icon{color:#111}
 .res-name-input-wrap .res-name-input-edit-icon svg{display:block;width:14px;height:14px}
-.res-name-input{background:transparent;border:none;font-family:'Space Mono','Courier New','Courier',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:center;color:#111;padding:0;width:100%;min-width:0;flex:1;outline:none}
+.res-name-input{background:transparent;border:none;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:center;color:#111;padding:0;width:100%;min-width:0;flex:1;outline:none}
 .res-name-input::placeholder{color:#999}
-.res-title{font-family:'Vina Sans','Impact','Arial Black',sans-serif;font-size:32px;text-transform:uppercase;color:#111;margin-bottom:8px}
-.res-score{font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;font-size:64px;font-weight:900;line-height:1;background:linear-gradient(180deg,#111 0%,#2a2a2a 35%,#444 50%,#2a2a2a 65%,#111 100%);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
-.res-meta{display:inline-block;font-size:12px;color:#555;font-family:'Space Mono','Courier New','Courier',monospace;text-transform:uppercase;letter-spacing:0.1em;margin-top:10px;padding:6px 14px;border-radius:9999px;background:rgba(0,0,0,0.06);font-weight:700}
+.res-title{font-family:Gasoek;font-size:22px;text-transform:uppercase;color:#111;margin-bottom:8px}
+.res-score{font-family:'Cabinet Grotesk';font-size:64px;font-weight:900;line-height:1;background:linear-gradient(180deg,#111 0%,#2a2a2a 35%,#444 50%,#2a2a2a 65%,#111 100%);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+.res-meta{display:inline-block;font-size:12px;color:#555;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-transform:uppercase;letter-spacing:0.1em;margin-top:10px;padding:6px 14px;border-radius:9999px;background:rgba(0,0,0,0.06);font-weight:700}
 .res-grid{display:grid;grid-template-columns:repeat(5,64px);gap:10px;justify-content:center;margin:20px auto;perspective:400px;position:relative}
 .res-grid::after{content:'';position:absolute;inset:-20px;background:radial-gradient(ellipse at center,rgba(222,255,10,0.08),transparent 70%);pointer-events:none;z-index:-1}
 .res-block{width:64px;height:64px;border-radius:10px;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d;transition:all 0.2s ease}
@@ -429,19 +440,22 @@ html, body, #root {
 @keyframes blockReveal{0%{transform:scale(0) rotateX(90deg);opacity:0}70%{transform:scale(1.1) rotateX(0deg);opacity:1}100%{transform:scale(1) rotateX(0deg);opacity:1}}
 .res-rows{width:100%;margin-top:24px;border-top:1px solid rgba(0,0,0,0.06)}
 .res-row{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,0.06)}
-.res-row-label{font-size:12px;color:#999;font-weight:700;width:36px;font-family:'Space Mono','Courier New','Courier',monospace;}
-.res-row-title{font-size:14px;color:#111;font-weight:600;flex:1;margin-left:8px;font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif}
-.res-pill{padding:4px 12px;border-radius:9999px;font-size:12px;font-weight:800;font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif}
+.res-row-label{font-size:12px;color:#999;font-weight:700;width:36px;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+.res-row-title{font-size:14px;color:#111;font-weight:600;flex:1;margin-left:8px;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.res-pill{padding:4px 12px;border-radius:9999px;font-size:12px;font-weight:900;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,sans-serif}
 .res-pill--correct{background:#DEFF0A;color:#111}
 .res-pill--wrong{background:#111;color:#F5F5F0}
 .results-footer{position:sticky;bottom:0;left:0;width:100%;padding:20px 0 24px;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:10;background:#F5F5F0;flex-shrink:0}
 .results-footer::before{content:'';position:absolute;bottom:100%;left:0;right:0;height:60px;background:linear-gradient(to bottom,rgba(245,245,240,0),rgba(245,245,240,1));pointer-events:none}
 .res-actions{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;max-width:800px;margin:0 auto;flex-wrap:wrap}
 .res-actions .btn-share,.res-actions .btn-play-again-outline{width:200px;min-width:200px;box-sizing:border-box}
-.btn-share{background:#DEFF0A;color:#111;border:none;border-radius:9999px;padding:14px 40px;font-family:'Space Mono','Courier New','Courier',monospace;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:8px}
-.btn-share:hover{opacity:0.95}
-.btn-play-again-outline{background:transparent;border:1.5px solid #111;border-radius:9999px;padding:12px 36px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#111;font-family:'Space Mono','Courier New','Courier',monospace;cursor:pointer;white-space:nowrap}
-.btn-play-again-outline:hover{background:rgba(0,0,0,0.04);border-color:#111}
+.btn-share{background:#DEFF0A;color:#111;border:none;border-radius:9999px;padding:14px 40px;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform 0.2s ease,box-shadow 0.2s ease,background 0.2s ease}
+.btn-share:hover{background:#d4f000;transform:scale(1.03);box-shadow:0 4px 16px rgba(222,255,10,0.4)}
+.btn-share:active{transform:scale(0.98)}
+.btn-play-again-outline{background:transparent;border:1.5px solid #111;border-radius:9999px;padding:12px 36px;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#111;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;cursor:pointer;white-space:nowrap;transition:transform 0.2s ease,box-shadow 0.2s ease,background 0.2s ease;outline:none;box-shadow:none}
+.btn-play-again-outline:hover{background:rgba(0,0,0,0.06);border-color:#111;transform:scale(1.03);box-shadow:0 4px 16px rgba(0,0,0,0.12)}
+.btn-play-again-outline:focus,.btn-play-again-outline:focus-visible{outline:none !important;box-shadow:0 0 0 0 transparent}
+.btn-play-again-outline:active{transform:scale(0.98)}
 
 @keyframes surFloat{0%,100%{transform:translateY(0) rotate(var(--r))}50%{transform:translateY(-18px) rotate(calc(var(--r) + 6deg))}}
 
@@ -540,7 +554,7 @@ html, body, #root {
   .H-sc-n{font-size:26px}
   .rnd{padding:8px 14px;font-size:11px}
   .s-hero{max-width:1100px;gap:100px}
-  .s-t{font-size:72px;line-height:1.05;letter-spacing:0.02em;max-width:9ch}
+  .s-t{font-size:72px;line-height:1.05;letter-spacing:0.02em;max-width:8ch}
   .s-sub{font-size:14px;line-height:1.55;max-width:420px}
   .btn-go{padding:18px 60px;font-size:16px;transition:all 0.2s ease}
   .btn-howto-wrap .btn-go,.btn-howto-wrap .btn-howto{width:250px;min-width:250px;max-width:250px;padding:18px 60px;font-size:16px}
@@ -564,13 +578,14 @@ html, body, #root {
 
 @media (min-width: 1440px){
   .s-hero{max-width:1200px;gap:120px}
-  .s-t{font-size:84px;max-width:9ch}
+  .s-t{font-size:84px;max-width:8ch}
   .s-stat-v{font-size:52px}
 }
 
 /* Micro-interaction keyframes */
 @keyframes correctPulse{0%{box-shadow:0 0 0 0 #DEFF0A}70%{box-shadow:0 0 0 12px rgba(222,255,10,0)}100%{box-shadow:0 0 0 0 transparent}}
 @keyframes confetti{0%{opacity:1;transform:translate(0,0) rotate(0deg)}100%{opacity:0;transform:translate(var(--cx),var(--cy)) rotate(var(--rot))}}
+@keyframes landingConfetti{0%{opacity:0.95;transform:translate(0,0) rotate(0deg)}70%{opacity:0.9;transform:translate(var(--tx),var(--ty)) rotate(var(--rot))}100%{opacity:0;transform:translate(var(--tx),var(--ty)) rotate(var(--rot))}}
 @keyframes bounceIn{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 @keyframes scorePulse{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
@@ -609,6 +624,8 @@ html, body, #root {
 .result-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.05);pointer-events:none;z-index:2;border-radius:4px}
 .confetti-wrap{position:absolute;inset:0;pointer-events:none;z-index:5}
 .confetti-piece{position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:1px;animation:confetti 1s ease-out forwards}
+.landing-confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:50}
+.landing-confetti-piece{position:absolute;top:-12px;width:10px;height:10px;border-radius:2px;animation:landingConfetti 2.4s ease-out forwards}
 .inp-wrap{position:relative;flex:1}
 .inp-x{position:absolute;right:0;top:50%;transform:translateY(-50%);font-size:18px;font-weight:700;color:#FF4444;animation:inpXFade 0.4s ease-out;pointer-events:none}
 @keyframes inpXFade{0%{opacity:0;transform:translateY(-50%) scale(0.5)}50%{opacity:1;transform:translateY(-50%) scale(1.2)}100%{opacity:0;transform:translateY(-50%) scale(1)}}
@@ -641,6 +658,9 @@ export default function AnimeGuesser() {
 
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiPieces, setConfettiPieces] = useState([]);
+  const [showLandingConfetti, setShowLandingConfetti] = useState(false);
+  const [landingConfettiPieces, setLandingConfettiPieces] = useState([]);
+  const landingConfettiShownRef = useRef(false);
   const [isShaking, setIsShaking] = useState(false);
   const [boardPulse, setBoardPulse] = useState(false);
   const [displayScore, setDisplayScore] = useState(0);
@@ -734,6 +754,18 @@ export default function AnimeGuesser() {
     }, 600);
     return () => clearInterval(interval);
   }, [loading]);
+
+  useEffect(() => {
+    if (screen !== "start" || loading || loadError || landingConfettiShownRef.current) return;
+    landingConfettiShownRef.current = true;
+    setShowLandingConfetti(true);
+    setLandingConfettiPieces(genLandingConfetti());
+    const t = setTimeout(() => {
+      setShowLandingConfetti(false);
+      setLandingConfettiPieces([]);
+    }, 3200);
+    return () => clearTimeout(t);
+  }, [screen, loading, loadError]);
 
   useEffect(() => { if (time === 0 && screen === "playing" && !result) endRound(false, 0); }, [time, screen, result]);
   useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
@@ -843,7 +875,7 @@ export default function AnimeGuesser() {
     e.preventDefault();
     if (!guess.trim() || result || !rounds) return;
     const n = guess.trim().toLowerCase();
-    if (rounds[round].accept.some(a => n === a)) endRound(true, calcScore(revealed.size, time, TIMER, TOTAL));
+    if (rounds[round].accept.some(a => n === a)) endRound(true, calcScore(revealed.size, time, TIMER));
     else {
       setWrongMsg(WRONG[Math.floor(Math.random() * WRONG.length)](guess.trim()));
       setInputShake(true); setInputBorderFlash(true); setWrongToastSlide(true); setInpXShow(true);
@@ -871,7 +903,7 @@ export default function AnimeGuesser() {
   };
 
   const pct = (time / TIMER) * 100;
-  const maxPts = rounds ? calcScore(revealed.size, time, TIMER, TOTAL) : 1000;
+  const maxPts = rounds ? calcScore(revealed.size, time, TIMER) : 1000;
 
   // ===== START / LOADING =====
   if (screen === "start") return (
@@ -885,7 +917,7 @@ export default function AnimeGuesser() {
       <div className={loading ? "S S--loading" : "S"}>
         {loading ? (
           <div className="s-loading s-z">
-            <div className="loader-card" style={{width:60,height:60,borderRadius:8,overflow:'hidden',animation:'flip 1.2s ease-in-out infinite',margin:'0 auto 16px',boxShadow:'0 4px 20px rgba(200,230,0,0.2)'}}>
+            <div className="loader-card" style={{width:75,height:75,borderRadius:8,overflow:'hidden',animation:'flip 1.2s ease-in-out infinite',margin:'0 auto 16px',boxShadow:'0 4px 20px rgba(200,230,0,0.2)'}}>
               <img
                 key={loadImgIndex}
                 src={LOADING_IMAGES[loadImgIndex]}
@@ -907,6 +939,25 @@ export default function AnimeGuesser() {
             <button className="btn btn-go" onClick={startGame}>Retry</button>
           </div>
         ) : (<>
+        {showLandingConfetti && (
+          <div className="landing-confetti-wrap" aria-hidden>
+            {landingConfettiPieces.map(p => (
+              <div
+                key={p.id}
+                className="landing-confetti-piece"
+                style={{
+                  left: `${p.left}%`,
+                  background: p.color,
+                  ['--tx']: `${p.tx}px`,
+                  ['--ty']: `${p.ty}vh`,
+                  ['--rot']: `${p.rot}deg`,
+                  animationDelay: `${p.delay}s`,
+                  animationDuration: `${p.duration}s`,
+                }}
+              />
+            ))}
+          </div>
+        )}
         {showRules && (
           <div
             className={`modal-backdrop ${modalExiting ? "modal-exit" : ""}`}
@@ -937,7 +988,7 @@ export default function AnimeGuesser() {
                 <span className="modal-rule-badge">3</span>
                 <span className="modal-rule-text">Fewer tiles + faster = more points</span>
               </div>
-              <p className="modal-score-note">Fewer tiles revealed + faster guess = higher score. Max 1,300 points per round.</p>
+              <p className="modal-score-note">Fewer tiles revealed + faster guess = higher score. Max 1,000 points per round.</p>
             </div>
           </div>
         )}
@@ -1031,7 +1082,7 @@ export default function AnimeGuesser() {
           img.src = avatar;
         } else if (!noAvatarNoName && playerName.trim()) {
           ctx.fillStyle = "#888";
-          ctx.font = "700 12px 'Space Mono','Courier New','Courier',monospace";
+          ctx.font = "700 12px 'Bricolage Grotesque',sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(playerName.trim().toUpperCase(), 200, y + 8);
@@ -1043,7 +1094,7 @@ export default function AnimeGuesser() {
         function drawRest(skipName) {
           if (!skipName && playerName.trim()) {
             ctx.fillStyle = "#888";
-            ctx.font = "700 12px 'Space Mono','Courier New','Courier',monospace";
+            ctx.font = "700 12px 'Bricolage Grotesque',sans-serif";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText(playerName.trim().toUpperCase(), 200, y + 8);
@@ -1057,7 +1108,7 @@ export default function AnimeGuesser() {
           ctx.fillText(total.toLocaleString(), 200, y + 28);
           y += 56 + 2;
           ctx.fillStyle = "#888";
-          ctx.font = "400 12px 'Space Mono','Courier New','Courier',monospace";
+          ctx.font = "400 12px 'Bricolage Grotesque',sans-serif";
           ctx.fillText(`${ct}/${rounds.length} CORRECT`, 200, y + 6);
           y += 12 + 16;
           const startX = (W - cols * blockSize - (cols - 1) * gap) / 2;
@@ -1089,7 +1140,7 @@ export default function AnimeGuesser() {
             ctx.fillText(r.correct ? "✓" : "✕", x + blockSize / 2, by + blockSize / 2);
           }
           ctx.fillStyle = "#bbb";
-          ctx.font = "400 10px 'Space Mono','Courier New','Courier',monospace";
+          ctx.font = "400 10px 'Bricolage Grotesque',sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText("PLAY AT ANIGUESS.COM", 200, H - 16);
