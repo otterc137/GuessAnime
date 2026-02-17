@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { submitScore, getTopScores } from './firebase';
 
 // Anime-only: all entries are MAL anime IDs (TV/movie). Primary image from main anime endpoint (cover); supplemented by /pictures for variety.
 const ANIME_DB = [
@@ -382,7 +383,12 @@ html, body, #root {
 .modal-rule:last-of-type{margin-bottom:0}
 .modal-rule-badge{width:32px;height:32px;border-radius:50%;background:#DEFF0A;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#111;flex-shrink:0}
 .modal-rule-text{font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;font-size:15px;color:#333;font-weight:500}
-.modal-score-note{font-size:12px;color:#999;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin-top:20px;text-transform:uppercase;letter-spacing:0.05em}
+.modal-tips{margin-top:20px;padding-top:16px;border-top:1px solid #eee}
+.modal-tips-label{font-size:11px;color:#999;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:10px}
+.modal-tips-list{list-style:none;padding:0;margin:0;font-size:13px;color:#555;font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;line-height:1.6}
+.modal-tips-list li{padding-left:18px;position:relative;margin-bottom:6px}
+.modal-tips-list li:last-child{margin-bottom:0}
+.modal-tips-list li::before{content:'';position:absolute;left:0;top:0.5em;width:4px;height:4px;border-radius:50%;background:#DEFF0A}
 .modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;min-width:32px;min-height:32px;padding:0;border-radius:50%;aspect-ratio:1;background:#111;color:#F5F5F0;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-sizing:border-box;flex-shrink:0}
 .modal-close .modal-close-icon{display:flex;align-items:center;justify-content:center;width:100%;height:100%;line-height:0;pointer-events:none}
 .modal-close:hover{opacity:0.9}
@@ -495,9 +501,8 @@ html, body, #root {
 .res-name-input-wrap .res-name-input-edit-icon svg{display:block;width:14px;height:14px}
 .res-name-input{background:transparent;border:none;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:center;color:#111;padding:0;width:100%;min-width:0;flex:1;outline:none}
 .res-name-input::placeholder{color:#999}
-.res-title{font-family:Gasoek;font-size:22px;text-transform:uppercase;color:#111;margin-bottom:8px}
+.res-title{font-family:Gasoek;font-size:22px;text-transform:uppercase;color:#111;margin-bottom:8px;padding-bottom:12px}
 .res-score{font-family:'Cabinet Grotesk';font-size:64px;font-weight:900;line-height:1;background:linear-gradient(180deg,#111 0%,#2a2a2a 35%,#444 50%,#2a2a2a 65%,#111 100%);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
-.res-meta{display:inline-block;font-size:12px;color:#555;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-transform:uppercase;letter-spacing:0.1em;margin-top:10px;padding:6px 14px;border-radius:9999px;background:rgba(0,0,0,0.06);font-weight:700}
 .res-grid{display:grid;grid-template-columns:repeat(5,64px);gap:10px;justify-content:center;margin:20px auto;perspective:400px;position:relative}
 .res-grid::after{content:'';position:absolute;inset:-20px;background:radial-gradient(ellipse at center,rgba(222,255,10,0.08),transparent 70%);pointer-events:none;z-index:-1}
 .res-block{width:64px;height:64px;border-radius:10px;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d;transition:all 0.2s ease}
@@ -519,6 +524,36 @@ html, body, #root {
 .res-pill{padding:4px 12px;border-radius:9999px;font-size:12px;font-weight:900;font-family:'SF Pro',-apple-system,BlinkMacSystemFont,sans-serif}
 .res-pill--correct{background:#DEFF0A;color:#111}
 .res-pill--wrong{background:#111;color:#F5F5F0}
+.btn-view-rounds{background:none;border:none;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#999;cursor:pointer;padding:8px 0;margin:8px auto;text-decoration:underline;text-underline-offset:3px;transition:color 0.2s}
+.btn-view-rounds:hover{color:#111}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.lb-title{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.round-row{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,0.06)}
+.round-label{font-size:12px;color:#999;font-weight:700;width:36px;font-family:'Space Mono',monospace}
+.round-title{font-size:14px;color:#111;font-weight:600;flex:1;margin-left:8px;font-family:'Cabinet Grotesk',sans-serif}
+.round-score-pill{padding:4px 12px;border-radius:9999px;font-size:12px;font-weight:900;font-family:'Space Mono',monospace}
+.round-score-pill.correct{background:#DEFF0A;color:#111}
+.round-score-pill.miss{background:#111;color:#F5F5F0}
+.leaderboard{width:100%;max-width:500px;margin:20px auto 0;background:#FFFFFF;border-radius:20px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 4px 24px rgba(0,0,0,0.06),0 1px 4px rgba(0,0,0,0.04);overflow:hidden;padding:0}
+.lb-header{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 20px;background:#111;color:#F5F5F0;font-family:'Vina Sans',sans-serif;font-size:18px;text-transform:uppercase;letter-spacing:0.05em}
+.lb-podium{display:flex;justify-content:center;align-items:flex-end;gap:12px;padding:24px 16px 16px;background:linear-gradient(180deg,rgba(200,230,0,0.06) 0%,transparent 100%)}
+.lb-podium-item{display:flex;flex-direction:column;align-items:center;gap:4px}
+.lb-podium-item.first{order:2}
+.lb-podium-item.second{order:1}
+.lb-podium-item.third{order:3}
+.lb-podium-rank{font-size:24px;line-height:1}
+.lb-podium-score-bar{width:80px;border-radius:10px 10px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:12px 8px 10px}
+.lb-podium-item.first .lb-podium-score-bar{height:100px;background:linear-gradient(180deg,#C8E600,#A8C200)}
+.lb-podium-item.second .lb-podium-score-bar{height:76px;background:linear-gradient(180deg,#E8E8E8,#CCCCCC)}
+.lb-podium-item.third .lb-podium-score-bar{height:60px;background:linear-gradient(180deg,#F5D0A9,#E8B878)}
+.lb-podium-name{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#111;text-transform:uppercase;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.lb-podium-score{font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:800;color:#111}
+.lb-list{padding:0 16px 16px}
+.lb-row{display:flex;align-items:center;padding:10px 12px;border-radius:10px;margin-bottom:4px;transition:background 0.2s}
+.lb-row.is-me{background:rgba(200,230,0,0.12)}
+.lb-rank{width:32px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#BBB;flex-shrink:0}
+.lb-name{flex:1;font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:600;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-row-score{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#666;flex-shrink:0}
 .results-footer{position:sticky;bottom:0;left:0;width:100%;padding:20px 0 24px;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:10;background:#F5F5F0;flex-shrink:0}
 .results-footer::before{content:'';position:absolute;bottom:100%;left:0;right:0;height:60px;background:linear-gradient(to bottom,rgba(245,245,240,0),rgba(245,245,240,1));pointer-events:none}
 .res-actions{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;max-width:800px;margin:0 auto;flex-wrap:wrap}
@@ -604,7 +639,7 @@ html, body, #root {
   .start-left{align-items:center}
   .start-title{text-align:center}
   .title-line2{white-space:nowrap}
-  .start-desc{text-align:center;font-size:14px}
+  .start-desc{text-align:center;font-size:16px}
   .start-buttons{flex-direction:row;justify-content:center}
   .s-stats{flex-wrap:nowrap;flex-direction:row;gap:10px;justify-content:center}
   .s-stat{flex:1;min-width:0;padding:20px 12px}
@@ -804,13 +839,16 @@ export default function AnimeGuesser() {
   const [playerName, setPlayerName] = useState("");
   const [imageSaved, setImageSaved] = useState(false);
   const avatarInputRef = useRef(null);
+  const [showRoundsModal, setShowRoundsModal] = useState(false);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [scoreSubmitted, setScoreSubmitted] = useState(false);
 
   const startGame = async () => {
     const replay = screen === "results" || screen === "playing";
     const titlesToAvoid = rounds && rounds.length > 0 ? rounds.map(r => r.hint) : [];
     if (titlesToAvoid.length > 0) setPrevGameTitles(titlesToAvoid);
     setIsReplay(replay);
-    setRound(0); setTotal(0); setResults([]); setStreak(0); setShowBar(false);
+    setRound(0); setTotal(0); setResults([]); setStreak(0); setShowBar(false); setScoreSubmitted(false);
     setLoading(true); setProg(0); setDisplayProg(0); setLoadError("");
     setLoadMsg(replay ? "SUMMONING NEW SCENES..." : "SUMMONING ANIME SCENES...");
     const pool = await loadAllImages((p) => {
@@ -885,6 +923,21 @@ export default function AnimeGuesser() {
       setShowConfetti(false);
     }
   }, [screen]);
+
+  useEffect(() => {
+    if (screen === 'results') {
+      getTopScores(10).then(setLeaderboard).catch(() => setLeaderboard([]));
+    }
+  }, [screen]);
+
+  useEffect(() => {
+    if (screen === 'results' && !scoreSubmitted) {
+      const correctCount = results.filter(r => r.correct).length;
+      submitScore(playerName, total, correctCount, avatar);
+      setScoreSubmitted(true);
+      setTimeout(() => getTopScores(10).then(setLeaderboard).catch(() => setLeaderboard([])), 1000);
+    }
+  }, [screen, scoreSubmitted]);
 
   useEffect(() => {
     if (!result || screen !== 'playing') return;
@@ -1103,7 +1156,14 @@ export default function AnimeGuesser() {
                 <span className="modal-rule-badge">3</span>
                 <span className="modal-rule-text">Fewer tiles + faster = more points</span>
               </div>
-              <p className="modal-score-note">Fewer tiles revealed + faster guess = higher score. Max 1,000 points per round.</p>
+              <div className="modal-tips">
+                <span className="modal-tips-label">Tips</span>
+                <ul className="modal-tips-list">
+                  <li>Reveal fewer tiles to earn more points.</li>
+                  <li>Guess quickly—speed boosts your score.</li>
+                  <li>Up to 1,000 points per round up for grabs.</li>
+                </ul>
+              </div>
             </div>
           </div>
         )}
@@ -1323,7 +1383,6 @@ export default function AnimeGuesser() {
             </div>
             <h1 className="res-title">{getResultTitle(total)}</h1>
             <div className="res-score">{total.toLocaleString()}</div>
-            <div className="res-meta">{ct}/{rounds.length} correct</div>
             <div className="res-grid">
               {displayResults.map((r, i) => (
                 <div
@@ -1342,18 +1401,70 @@ export default function AnimeGuesser() {
                 </div>
               ))}
             </div>
-            <div className="res-rows">
-              {displayResults.map((r, i) => (
-                <div key={i} className="res-row">
-                  <span className="res-row-label">R{i + 1}</span>
-                  <span className="res-row-title">{r.answer}</span>
-                  <span className={`res-pill ${r.correct ? "res-pill--correct" : "res-pill--wrong"}`}>
-                    {r.correct ? r.score : "MISS"}
-                  </span>
+            <button type="button" className="btn-view-rounds" onClick={() => setShowRoundsModal(true)}>
+              SEE ROUND DETAILS
+            </button>
+            <div className="leaderboard">
+              <div className="lb-header">🏆 TOP 10</div>
+              {leaderboard.length === 0 ? (
+                <div style={{padding: '24px 16px', textAlign: 'center'}}>
+                  <p style={{fontFamily: "'Space Mono',monospace", fontSize: 12, color: '#999'}}>
+                    No scores yet. Be the first!
+                  </p>
                 </div>
-              ))}
+              ) : leaderboard.length < 3 ? (
+                <div className="lb-list">
+                  {leaderboard.map((entry, i) => (
+                    <div className={`lb-row ${entry.name === playerName && entry.score === total ? 'is-me' : ''}`} key={entry.id}>
+                      <span className="lb-rank">{['👑','🥈','🥉'][i]}</span>
+                      <span className="lb-name">{entry.name || 'Anonymous'}</span>
+                      <span className="lb-row-score">{entry.score.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <div className="lb-podium">
+                    {[1, 0, 2].map(i => (
+                      <div className={`lb-podium-item ${['first','second','third'][i]}`} key={leaderboard[i].id}>
+                        <span className="lb-podium-rank">{['👑','🥈','🥉'][i]}</span>
+                        <div className="lb-podium-score-bar">
+                          <span className="lb-podium-score">{leaderboard[i].score.toLocaleString()}</span>
+                        </div>
+                        <span className="lb-podium-name">{leaderboard[i].name || 'Anonymous'}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="lb-list">
+                    {leaderboard.slice(3).map((entry, i) => (
+                      <div className={`lb-row ${entry.name === playerName && entry.score === total ? 'is-me' : ''}`} key={entry.id}>
+                        <span className="lb-rank">#{i + 4}</span>
+                        <span className="lb-name">{entry.name || 'Anonymous'}</span>
+                        <span className="lb-row-score">{entry.score.toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
+          {showRoundsModal && (
+            <div className="modal-overlay" onClick={() => setShowRoundsModal(false)}>
+              <div className="modal-card" onClick={e => e.stopPropagation()}>
+                <button type="button" className="modal-close" onClick={() => setShowRoundsModal(false)}>✕</button>
+                <h3 className="lb-title" style={{fontSize:24, marginBottom:16}}>ROUND BREAKDOWN</h3>
+                {displayResults.map((r, i) => (
+                  <div className="round-row" key={i}>
+                    <span className="round-label">R{i + 1}</span>
+                    <span className="round-title">{r.answer || rounds?.[i]?.hint}</span>
+                    <span className={`round-score-pill ${r.correct ? 'correct' : 'miss'}`}>
+                      {r.correct ? r.score : 'MISS'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="results-footer">
             <div className="res-actions">
               <button type="button" className="btn-play-again-outline" onClick={() => { setScreen("start"); startGame(); }}>
