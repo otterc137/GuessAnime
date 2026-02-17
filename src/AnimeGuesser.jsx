@@ -207,7 +207,7 @@ html, body, #root {
 .s-loading-text{font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:0.1em;font-size:13px;color:#111;text-align:center}
 .s-loading-pct{font-family:'Cabinet Grotesk',sans-serif;font-size:28px;font-weight:900;color:#111}
 .s-loading-bar{width:280px;height:6px;border-radius:4px;background:#E0E0D8;margin:0 auto;overflow:hidden}
-.s-loading-bar-fill{height:100%;border-radius:4px;background:#C8E600;transition:width 0.4s}
+.s-loading-bar-fill{height:100%;border-radius:4px;background:rgba(200,230,0,1);transition:width 0.4s}
 .s-loading-tip{font-size:11px;color:#999;font-style:italic;margin-top:16px}
 @media (min-width:768px){.s-loading-bar{width:280px}}
 
@@ -285,12 +285,9 @@ html, body, #root {
 .modal-close .modal-close-icon{display:flex;align-items:center;justify-content:center;width:100%;height:100%;line-height:0;pointer-events:none}
 .modal-close:hover{opacity:0.9}
 .btn-nxt{width:100%;max-width:100%;padding:14px 32px;font-size:12px;color:#FFF;background:#111;border-radius:9999px;text-transform:uppercase;letter-spacing:0.1em}
-.btn-gs{padding:14px 32px;font-size:12px;font-weight:700;color:#FFF;background:#111;border-radius:9999px;text-transform:uppercase;letter-spacing:0.1em}
 .btn-pill{font-family:'Space Mono',monospace;padding:6px 18px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;background:transparent;border:1.5px solid #111;border-radius:9999px;color:var(--t);cursor:pointer}
 .btn-pill:hover{background:#FFF;border-color:#111}
 .btn-pill.active{background:#111;color:#FFF}
-.btn-giveup{font-family:'Space Mono',monospace;display:block;margin:16px auto 0;padding:14px 32px;font-size:12px;font-weight:700;color:var(--t2);background:transparent;border:1.5px solid var(--b);border-radius:9999px;cursor:pointer;text-transform:uppercase;letter-spacing:0.1em}
-.btn-giveup:hover{color:var(--t);background:#FFF;border-color:#111}
 
 .logo{font-family:'Vina Sans',cursive;font-weight:400;color:var(--t);letter-spacing:0.08em}
 .logo sup{font-size:0.5em;opacity:0.8;vertical-align:super;margin-left:1px}
@@ -312,7 +309,7 @@ html, body, #root {
 .rnd{font-family:'Space Mono',monospace;padding:4px 8px;background:transparent;border:1px solid var(--b);border-radius:4px;font-size:9px;font-weight:700;color:var(--t);text-transform:uppercase;letter-spacing:0.1em}
 .dots{display:flex;gap:3px;align-items:center}
 .dot{width:5px;height:5px;border-radius:0;background:var(--t);transition:background 0.2s}
-.H-sc{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 10px;height:44px;box-sizing:border-box;border-radius:8px;background:rgba(255,255,255,0.5);border:1px solid rgba(0,0,0,0.04);box-shadow:none}
+.H-sc{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;padding:4px 10px;height:44px;box-sizing:border-box;border-radius:8px;background:rgba(255,255,255,0.5);border:1px solid rgba(0,0,0,0.04);box-shadow:none}
 .H-sc-l{font-family:'Space Mono',monospace;font-size:9px;color:var(--t);font-weight:700;text-transform:uppercase;letter-spacing:0.12em}
 .H-sc-n{font-family:'Cabinet Grotesk',sans-serif;font-size:18px;font-weight:900;color:#444}
 .H-sc-pts{font-size:16px;font-weight:700;color:rgba(68,68,68,0.5);margin-left:2px}
@@ -361,34 +358,48 @@ html, body, #root {
 .res-miss{font-family:'Space Mono',monospace;font-size:12px;color:var(--t2);margin-top:8px;text-transform:uppercase}
 .res-miss strong{color:var(--t);font-weight:700}
 
-.I{width:100%;margin-top:10px;flex-shrink:0}
-.Ir{display:flex;flex-direction:row;gap:10px;align-items:center;flex-wrap:wrap}
-.input-bar{background:var(--accent);border-radius:12px;padding:10px 16px;margin-top:0;flex:1;min-width:0}
-.inp{font-family:'Space Mono',monospace;flex:1;padding:8px 0;font-size:13px;font-weight:500;color:#111;background:transparent;border:none;border-bottom:2px solid #111;outline:none;caret-color:#111;text-align:left;text-transform:uppercase;min-width:0}
-.inp::placeholder{color:#999}
-.inp.er{border-bottom-color:#111}
-.btn-gs{background:#111;color:#F5F5F0;border-radius:9999px;padding:10px 24px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;flex-shrink:0}
-.btn-giveup{font-family:'Space Mono',monospace;display:block;margin:6px auto 0;padding:0;background:none;border:none;color:#999;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;text-decoration:underline;cursor:pointer}
-.btn-giveup:hover{color:#111}
-.wt{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;padding:12px 16px;background:#fff5f5;border:1px solid #b91c1c;color:#b91c1c;font-family:'Space Mono',monospace;font-size:12px;font-weight:600;text-transform:uppercase}
-.wt-icon{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;font-size:12px;font-weight:700;flex-shrink:0;color:#b91c1c}
-.ht{font-family:'Space Mono',monospace;text-align:center;font-size:10px;color:var(--t2);margin-top:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em}
+.I{width:100%;margin-top:10px;flex-shrink:0;display:flex;flex-direction:column;align-items:stretch;position:relative;z-index:5}
+.input-row{display:flex;flex-direction:column;gap:8px;width:100%;align-items:stretch}
+.input-row-actions{display:flex;gap:8px;align-items:center;width:100%}
+.input-row-actions .btn-confirm{flex:1;min-width:0}
+.game-input{flex:1;min-width:0;padding:12px 16px;font-family:'Space Mono',monospace;font-size:15px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#111;background:#FFFFFF;border:1.5px solid #111;border-image:none;border-radius:12px;outline:none;caret-color:#111;transition:border-color 0.2s,box-shadow 0.2s}
+.game-input::placeholder{color:#999;font-weight:500}
+.game-input:focus{border-color:rgba(200,230,0,0.71);box-shadow:0 0 0 3px rgba(0,0,0,0.08)}
+.game-input.error{border-color:#FF3333;box-shadow:0 0 0 3px rgba(255,51,51,0.15);animation:inputShake 0.4s ease}
+.btn-confirm{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#F5F5F0;background:#111;border:2px solid #111;border-radius:12px;cursor:pointer;transition:all 0.15s ease;white-space:nowrap;flex-shrink:0}
+.btn-confirm:hover{background:rgba(200,230,0,1);color:#111;border-color:#111}
+.btn-confirm:active{transform:translateY(2px)}
+.btn-giveup-ghost{display:flex;align-items:center;justify-content:center;gap:6px;min-width:52px;height:52px;padding:0 14px;box-sizing:border-box;background:transparent;border:1.5px solid #333;border-radius:12px;cursor:pointer;color:#555;transition:all 0.2s ease;flex-shrink:0;position:relative;z-index:5;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em}
+.btn-giveup-ghost:hover{border-color:#FF3333;color:#FF3333;background:rgba(255,51,51,0.04)}
+.btn-giveup-ghost:active{transform:translateY(1px)}
+.wrong-toast{text-align:center;margin-top:8px;padding:8px 16px;border-radius:8px;background:rgba(255,51,51,0.08);border:1px solid rgba(255,51,51,0.15);color:#FF3333;font-family:'Space Mono',monospace;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;animation:popIn 0.25s ease}
+.wrong-toast.toast-enter{animation:toastSlideUp 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards}
+.ht{font-family:'Space Mono',monospace;text-align:center;font-size:10px;color:#ccc;margin-top:6px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em}
 
 .S--results{min-height:100vh;max-height:100vh;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden}
 .S--results .res-wrap{flex:1;min-height:0;overflow-y:auto;padding-bottom:120px}
 .res-wrap{width:100%;max-width:800px;margin-left:auto;margin-right:auto;display:flex;flex-direction:column;align-items:center;padding:24px;box-sizing:border-box}
 .res-profile{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:20px}
-.res-avatar{width:56px;height:56px;border-radius:50%;background:#E0E0D8;border:2px solid #111;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;flex-shrink:0}
+.res-avatar{width:56px;height:56px;border-radius:50%;background:#E0E0D8;border:1.5px solid rgba(0,0,0,0);border-image:none;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;flex-shrink:0;transition:background 0.2s ease,border-color 0.2s ease,transform 0.2s ease}
+.res-avatar:hover{background:#D5D5CC;border-color:rgba(0,0,0,0.12);transform:scale(1.04)}
 .res-avatar img{width:100%;height:100%;object-fit:cover}
-.res-avatar-icon{color:#999;font-size:20px;line-height:1;pointer-events:none}
-.res-name-input{background:transparent;border:none;border-bottom:1.5px solid #111;font-family:'Space Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:center;color:#111;padding:6px 0;width:160px;outline:none}
+.res-avatar-icon{color:#999;font-size:24px;line-height:1;pointer-events:none;display:flex;align-items:center;justify-content:center}
+.res-avatar-icon svg{display:block}
+.res-avatar:hover .res-avatar-icon{color:#777}
+.res-name-input-wrap{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:8px 0;border-bottom:1.5px solid #e0e0d8;transition:border-color 0.2s ease, box-shadow 0.2s ease;min-width:180px}
+.res-name-input-wrap:focus-within{border-bottom-color:#111;outline:none}
+.res-name-input-wrap .res-name-input-edit-icon{flex-shrink:0;color:#999;transition:color 0.2s ease;display:flex;align-items:center;justify-content:center}
+.res-name-input-wrap:focus-within .res-name-input-edit-icon{color:#111}
+.res-name-input-wrap .res-name-input-edit-icon svg{display:block;width:14px;height:14px}
+.res-name-input{background:transparent;border:none;font-family:'Space Mono',monospace;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:center;color:#111;padding:0;width:100%;min-width:0;flex:1;outline:none}
 .res-name-input::placeholder{color:#999}
-.res-title{font-family:'Vina Sans',cursive;font-size:36px;text-transform:uppercase;color:#111;margin-bottom:8px}
-.res-score{font-family:'Cabinet Grotesk',sans-serif;font-size:72px;font-weight:900;color:#111;line-height:1}
+.res-title{font-family:'Vina Sans',cursive;font-size:32px;text-transform:uppercase;color:#111;margin-bottom:8px}
+.res-score{font-family:'Cabinet Grotesk',sans-serif;font-size:64px;font-weight:900;line-height:1;background:linear-gradient(180deg,#111 0%,#2a2a2a 35%,#444 50%,#2a2a2a 65%,#111 100%);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
 .res-meta{display:inline-block;font-size:12px;color:#555;font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:0.1em;margin-top:10px;padding:6px 14px;border-radius:9999px;background:rgba(0,0,0,0.06);font-weight:700}
 .res-grid{display:grid;grid-template-columns:repeat(5,64px);gap:10px;justify-content:center;margin:20px auto;perspective:400px;position:relative}
 .res-grid::after{content:'';position:absolute;inset:-20px;background:radial-gradient(ellipse at center,rgba(222,255,10,0.08),transparent 70%);pointer-events:none;z-index:-1}
 .res-block{width:64px;height:64px;border-radius:10px;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d;transition:all 0.2s ease}
+.res-block>.res-block-icon{display:flex;align-items:center;justify-content:center;width:100%;height:100%;line-height:1;text-align:center}
 .res-block:nth-child(odd){transform:rotate(-1deg)}
 .res-block:nth-child(even){transform:rotate(0.8deg)}
 .res-block--correct{background:#DEFF0A;box-shadow:inset 0 4px 12px rgba(0,80,0,0.15),inset 0 -2px 8px rgba(255,255,255,0.3),0 4px 16px rgba(222,255,10,0.25);border:1.5px solid rgba(0,0,0,0.06)}
@@ -408,7 +419,7 @@ html, body, #root {
 .res-pill--wrong{background:#111;color:#F5F5F0}
 .results-footer{position:sticky;bottom:0;left:0;width:100%;padding:20px 0 24px;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:10;background:#F5F5F0;flex-shrink:0}
 .results-footer::before{content:'';position:absolute;bottom:100%;left:0;right:0;height:60px;background:linear-gradient(to bottom,rgba(245,245,240,0),rgba(245,245,240,1));pointer-events:none}
-.res-actions{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:800px;margin:0 auto}
+.res-actions{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;max-width:800px;margin:0 auto;flex-wrap:wrap}
 .res-actions .btn-share,.res-actions .btn-play-again-outline{width:200px;min-width:200px;box-sizing:border-box}
 .btn-share{background:#DEFF0A;color:#111;border:none;border-radius:9999px;padding:14px 40px;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:8px}
 .btn-share:hover{opacity:0.95}
@@ -427,6 +438,11 @@ html, body, #root {
 .float-star1{top:18%;right:12%;width:30px;height:30px;background:#DEFF0A;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);box-shadow:0 4px 12px rgba(222,255,10,0.4);--r:0deg;animation-duration:5.5s;animation-delay:0.8s}
 .float-star2{bottom:22%;left:8%;width:30px;height:30px;background:#DEFF0A;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);box-shadow:0 4px 12px rgba(222,255,10,0.4);--r:0deg;animation-duration:9s;animation-delay:1.2s}
 
+@media (min-width:768px){
+  .input-row{flex-direction:row;align-items:center}
+  .input-row-actions{width:auto;flex-shrink:0}
+  .input-row-actions .btn-confirm{flex:0 1 auto}
+}
 @media (max-width: 767px){
   .float-sphere{width:39px;height:39px;box-shadow:inset -5px -5px 13px rgba(0,0,0,0.3),inset 3px 3px 6px rgba(255,255,255,0.4),0 6px 20px rgba(226,69,10,0.3)}
   .float-pill{width:52px;height:23px}
@@ -473,8 +489,6 @@ html, body, #root {
   .B{max-width:100%;aspect-ratio:16/8}
   .res{max-width:100%}
   .I{max-width:100%}
-  .Ir{flex-direction:row;align-items:center}
-  .input-bar{background:var(--accent);padding:10px 16px;margin-top:0;border-radius:12px}
   .H-sc-n{font-size:22px}
   .res-grid{grid-template-columns:repeat(5,80px)}
   .res-block{width:80px;height:80px}
@@ -529,6 +543,7 @@ html, body, #root {
 @keyframes inputShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 @keyframes wrongBorderFlash{0%{border-bottom-color:#FF4444}100%{border-bottom-color:var(--b)}}
 @keyframes toastSlideUp{0%{opacity:0;transform:translateY(12px)}70%{transform:translateY(-2px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes popIn{0%{opacity:0;transform:scale(0.96)}100%{opacity:1;transform:scale(1)}}
 @keyframes tileReveal{to{opacity:0;transform:scale(0.5) rotateX(90deg)}}
 @keyframes tileFlip{0%{transform:scale(1) rotateY(0);opacity:1}100%{transform:scale(0.7) rotateY(90deg);opacity:0}}
 @keyframes ripple{0%{transform:scale(0);opacity:0.6}100%{transform:scale(2);opacity:0}}
@@ -542,9 +557,7 @@ html, body, #root {
 .res-e.bounce-in{animation:bounceIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards}
 .res-p.score-flash{transition:color 0.5s ease,opacity 0.5s ease}
 .float-score-text{color:#111;font-family:'Cabinet Grotesk',sans-serif;font-size:36px;font-weight:900}
-.inp.input-shake{animation:inputShake 0.4s ease-out}
-.inp.border-flash{animation:wrongBorderFlash 0.3s ease-out}
-.wt.toast-enter{animation:toastSlideUp 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards}
+.wrong-toast.toast-enter{animation:toastSlideUp 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards}
 .tile.tile-flipping{animation:tileFlip 0.25s ease-out forwards;pointer-events:none}
 .tile.tile-cascade{animation:tileReveal 0.4s ease-out forwards}
 .res-miss.typewriter{overflow:hidden;white-space:nowrap;border-right:2px solid var(--t);animation:typewriterCursor 0.5s step-end infinite}
@@ -1034,10 +1047,10 @@ export default function AnimeGuesser() {
           ctx.lineWidth = 1.5;
           ctx.stroke();
           ctx.fillStyle = r.correct ? "#111" : "#555";
-          ctx.font = "800 12px 'Cabinet Grotesk', sans-serif";
+          ctx.font = r.correct ? "900 20px 'Cabinet Grotesk', sans-serif" : "700 16px 'Cabinet Grotesk', sans-serif";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillText(r.correct ? String(r.score) : "✕", x + blockSize / 2, by + blockSize / 2);
+          ctx.fillText(r.correct ? "✓" : "✕", x + blockSize / 2, by + blockSize / 2);
         }
         ctx.fillStyle = "#bbb";
         ctx.font = "400 10px 'Space Mono', monospace";
@@ -1065,16 +1078,29 @@ export default function AnimeGuesser() {
                 style={{ display: "none" }}
                 onChange={handleAvatarChange}
               />
-              <div className="res-avatar" onClick={() => avatarInputRef.current?.click()} role="button" tabIndex={0} onKeyDown={e => e.key === "Enter" && avatarInputRef.current?.click()}>
-                {avatar ? <img src={avatar} alt="" /> : <span className="res-avatar-icon">+</span>}
+              <div className="res-avatar" onClick={() => avatarInputRef.current?.click()} role="button" tabIndex={0} aria-label="Upload profile image" title="Click to upload image" onKeyDown={e => e.key === "Enter" && avatarInputRef.current?.click()}>
+                {avatar ? <img src={avatar} alt="" /> : (
+                  <span className="res-avatar-icon" aria-hidden>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                    </svg>
+                  </span>
+                )}
               </div>
-              <input
-                type="text"
-                className="res-name-input"
-                placeholder="YOUR NAME"
-                value={playerName}
-                onChange={e => setPlayerName(e.target.value)}
-              />
+              <div className="res-name-input-wrap">
+                <span className="res-name-input-edit-icon" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </span>
+                <input
+                  type="text"
+                  className="res-name-input"
+                  placeholder="YOUR NAME, SENPAI"
+                  value={playerName}
+                  onChange={e => setPlayerName(e.target.value)}
+                />
+              </div>
             </div>
             <h1 className="res-title">{getResultTitle(total)}</h1>
             <div className="res-score">{total.toLocaleString()}</div>
@@ -1090,9 +1116,9 @@ export default function AnimeGuesser() {
                   }}
                 >
                   {r.correct ? (
-                    <span className="res-block-num">{r.score}</span>
+                    <span className="res-block-icon" style={{ fontSize: 24, fontWeight: 900, color: '#111' }}>✓</span>
                   ) : (
-                    <span className="res-block-num">✕</span>
+                    <span className="res-block-icon" style={{ fontSize: 20, fontWeight: 700, color: '#555' }}>✕</span>
                   )}
                 </div>
               ))}
@@ -1111,12 +1137,12 @@ export default function AnimeGuesser() {
           </div>
           <div className="results-footer">
             <div className="res-actions">
+              <button type="button" className="btn-play-again-outline" onClick={() => { setScreen("start"); startGame(); }}>
+                Play Again
+              </button>
               <button type="button" className="btn-share" onClick={saveImage}>
                 <span aria-hidden>↓</span>
                 {imageSaved ? "SAVED!" : "SAVE IMAGE"}
-              </button>
-              <button type="button" className="btn-play-again-outline" onClick={() => { setScreen("start"); startGame(); }}>
-                Play Again
               </button>
             </div>
           </div>
@@ -1233,19 +1259,44 @@ export default function AnimeGuesser() {
 
             <div className="I">
               {!result?(<>
-                <div className="input-bar">
-                  <form className="Ir" onSubmit={handleSubmit}>
-                    <div className="inp-wrap">
-                      <input ref={inputRef} type="text" value={guess} onChange={e=>setGuess(e.target.value)}
-                        placeholder="TYPE ANIME NAME" autoComplete="off"
-                        className={`inp ${wrongMsg?"er":""} ${inputShake?"input-shake":""} ${inputBorderFlash?"border-flash":""}`}/>
-                      {inpXShow && <span className="inp-x" aria-hidden>✗</span>}
-                    </div>
-                    <button type="submit" className="btn btn-gs">CONFIRM GUESS</button>
-                  </form>
-                </div>
-                {wrongMsg&&<div className={`wt ${wrongToastSlide?"toast-enter":""}`}><span className="wt-icon" aria-hidden>✗</span>{wrongMsg}</div>}
-                <button type="button" className="btn-giveup" onClick={giveUp}>Give Up</button>
+                <form className="input-row" onSubmit={handleSubmit}>
+                  <input ref={inputRef} type="text" value={guess} onChange={e=>setGuess(e.target.value)}
+                    placeholder="TYPE ANIME NAME" autoComplete="off"
+                    aria-label="Type your anime guess"
+                    className={`game-input ${wrongMsg?"error":""}`}/>
+                  <div className="input-row-actions">
+                    <button type="submit" className="btn-confirm" aria-label="Submit guess">
+                      CONFIRM
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                    <button type="button" className="btn-giveup-ghost" onClick={giveUp} aria-label="Give up">
+                      <span>GIVE UP</span>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="giveup-flag" aria-hidden>
+                        <defs>
+                          <linearGradient id="giveup-pole" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="currentColor" stopOpacity="0.5"/>
+                            <stop offset="30%" stopColor="currentColor"/>
+                            <stop offset="100%" stopColor="currentColor"/>
+                          </linearGradient>
+                          <linearGradient id="giveup-flag-fill" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#FFF"/>
+                            <stop offset="100%" stopColor="#E8E8E2"/>
+                          </linearGradient>
+                          <filter id="giveup-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feDropShadow dx="0" dy="1" stdDeviation="0.8" floodOpacity="0.2"/>
+                          </filter>
+                        </defs>
+                        <ellipse cx="12" cy="21.5" rx="4" ry="1" fill="rgba(0,0,0,0.08)" />
+                        <rect x="4" y="2" width="2.5" height="20" rx="1.25" fill="url(#giveup-pole)" />
+                        <path d="M6.5 3 L19.5 5 L18.5 12.5 L6.5 10.5 Z" fill="url(#giveup-flag-fill)" stroke="currentColor" strokeWidth="0.8" strokeLinejoin="round" filter="url(#giveup-shadow)" />
+                        <path d="M6.5 3 L15 4.2 L14.2 8.5 L6.5 7.2 Z" fill="rgba(255,255,255,0.7)" />
+                        <circle cx="5.25" cy="2.5" r="1.4" fill="currentColor"/>
+                        <circle cx="4.9" cy="2" r="0.4" fill="rgba(255,255,255,0.85)"/>
+                      </svg>
+                    </button>
+                  </div>
+                </form>
+                {wrongMsg&&<div role="status" className={`wrong-toast ${wrongToastSlide?"toast-enter":""}`}>{wrongMsg}</div>}
               </>):(
                 <button className="btn btn-nxt" onClick={nextRound}>
                   {round<rounds.length-1?"Next Round →":"See Results →"}
