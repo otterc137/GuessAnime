@@ -787,6 +787,7 @@ export default function AnimeGuesser() {
   const [revealed, setRevealed] = useState(new Set());
   const [guess, setGuess] = useState("");
   const [time, setTime] = useState(TIMER);
+  const [timerStarted, setTimerStarted] = useState(false);
   const [total, setTotal] = useState(0);
   const [rScore, setRScore] = useState(0);
   const [result, setResult] = useState(null);
@@ -832,15 +833,13 @@ export default function AnimeGuesser() {
 
   const initRound = useCallback(() => {
     setRevealed(new Set()); setGuess(""); setTime(TIMER);
+    setTimerStarted(false);
     setResult(null); setRScore(0); setWrongMsg(""); setFloats([]);
     setShowConfetti(false); setConfettiPieces([]); setIsShaking(false); setBoardPulse(false);
     setDisplayScore(0); setInputShake(false); setInputBorderFlash(false); setWrongToastSlide(false);
     setInpXShow(false); setFlippingTiles(new Set()); setRippleTile(null); setCascadeReveal(false);
     setTypewriterText(""); setShowOverlay(false);
     if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setTime(p => { if (p <= 1) { clearInterval(timerRef.current); return 0; } return p - 1; });
-    }, 1000);
     setTimeout(() => inputRef.current?.focus(), 100);
   }, []);
 
@@ -947,23 +946,27 @@ export default function AnimeGuesser() {
     if (screen === 'results') {
       getTopScores(10).then(scores => {
         if (scoreSubmittedRef.current) return;
-        if (scores && scores.length > 0) {
-          const merged = [...scores];
-          let i = 0;
-          while (merged.length < 10 && i < DEFAULT_LEADERBOARD.length) {
-            merged.push(DEFAULT_LEADERBOARD[i]);
-            i++;
-          }
-          merged.sort((a, b) => b.score - a.score);
-          setLeaderboard(merged.slice(0, 10));
-        } else {
-          setLeaderboard(DEFAULT_LEADERBOARD);
+        const list = scores && scores.length > 0 ? scores : [];
+        const merged = [...list];
+        let i = 0;
+        while (merged.length < 10 && i < DEFAULT_LEADERBOARD.length) {
+          merged.push(DEFAULT_LEADERBOARD[i]);
+          i++;
         }
+        merged.sort((a, b) => b.score - a.score);
+        setLeaderboard(merged.slice(0, 10));
       }).catch(() => {
         if (!scoreSubmittedRef.current) setLeaderboard(DEFAULT_LEADERBOARD);
       });
     }
   }, [screen]);
+
+  // Ensure we never show an empty leaderboard on results (safeguard for race conditions)
+  useEffect(() => {
+    if (screen === 'results' && leaderboard.length === 0) {
+      setLeaderboard(DEFAULT_LEADERBOARD);
+    }
+  }, [screen, leaderboard.length]);
 
   useEffect(() => {
     if (screen === 'results' && !scoreSubmitted && total > 0) {
@@ -998,6 +1001,13 @@ export default function AnimeGuesser() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [result, screen]);
 
+  useEffect(() => {
+    if (screen !== "playing" || !timerStarted || result) return;
+    const id = setInterval(() => {
+      setTime(p => { if (p <= 1) { clearInterval(id); return 0; } return p - 1; });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [screen, timerStarted, result]);
   useEffect(() => { if (time === 0 && screen === "playing" && !result) endRound(false, 0); }, [time, screen, result]);
   useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
 
@@ -1637,6 +1647,7 @@ export default function AnimeGuesser() {
 
   const handleTileClick = (i) => {
     if (revealed.has(i) || result || flippingTiles.has(i)) return;
+    if (!timerStarted) setTimerStarted(true);
     setFlippingTiles(s => new Set(s).add(i));
     setRippleTile(i);
     setTimeout(() => {
@@ -1730,7 +1741,7 @@ export default function AnimeGuesser() {
               {!result?(<>
                 <form className="input-row" onSubmit={handleSubmit}>
                   <input ref={inputRef} type="text" value={guess} onChange={e=>setGuess(e.target.value)}
-                    placeholder="TYPE ANIME NAME" autoComplete="off"
+                    placeholder="TYPE ANIME NAME OR ACRONYM (E.G. JJK)" autoComplete="off"
                     aria-label="Type your anime guess"
                     className={`game-input ${wrongMsg?"error":""}`}/>
                   <div className="input-row-actions">
