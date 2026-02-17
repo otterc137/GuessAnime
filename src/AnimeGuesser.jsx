@@ -159,8 +159,20 @@ function genConfetti() {
   }));
 }
 
-function calcScore(t, tiles) {
-  return Math.max(10, Math.round(Math.round(1000 - (tiles / TOTAL) * 900) * (t / TIMER)));
+function calcScore(tilesRevealed, timeLeft, totalTime, totalTiles) {
+  // Base score: starts at 1000, loses points per tile opened
+  const tilesPenalty = (tilesRevealed / totalTiles) * 700;
+  const baseScore = Math.max(1000 - tilesPenalty, 100);
+
+  // Time bonus: up to 200 extra points for fast answers
+  const timeRatio = timeLeft / totalTime;
+  const timeBonus = Math.round(timeRatio * 200);
+
+  // Early guess bonus: bonus for guessing with fewer tiles
+  const earlyBonus = Math.max(0, Math.round((1 - tilesRevealed / 6) * 100));
+
+  const total = Math.round(baseScore + timeBonus + earlyBonus);
+  return Math.min(total, 1300);
 }
 
 function getRank(p) {
@@ -200,7 +212,12 @@ html, body, #root {
 :root{
   --bg:#F5F5F0;--accent:#DEFF0A;--t:#111111;--t2:#333;--b:#111;--card:#FFFFFF;
 }
-.R{width:100%;min-width:100%;min-height:100vh;font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;background:#F5F5F0;color:var(--t);position:relative;overflow-x:hidden;border-top:3px solid #DEFF0A}
+@font-face{
+  font-family:'Gasoek';
+  src:url('/fonts/Gasoek-Heavy.ttf') format('truetype');
+  font-weight:400;font-style:normal;font-display:swap;
+}
+.R{width:100%;min-width:100%;min-height:100vh;max-width:100vw;font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;background:#F5F5F0;color:var(--t);position:relative;overflow-x:hidden;border-top:3px solid #DEFF0A}
 .R,.R *{cursor:url('/pochita-cursor.png') 16 16,auto !important}
 
 .s-loading{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center}
@@ -216,7 +233,7 @@ html, body, #root {
 .P{justify-content:flex-start;padding:12px 16px;align-items:stretch;height:100vh;display:flex;flex-direction:column;overflow:hidden}
 
 .s-z{position:relative;z-index:2}
-.s-t{font-family:'Vina Sans','Impact','Arial Black',sans-serif;font-weight:400;font-size:68px;letter-spacing:0.05em;color:var(--t);margin-bottom:16px;line-height:1.05;text-transform:uppercase;text-align:left;width:100%}
+.s-t{font-family:'Gasoek','Vina Sans','Impact','Arial Black',sans-serif;font-weight:400;font-size:68px;letter-spacing:0.05em;color:var(--t);margin-bottom:16px;line-height:1.05;text-transform:uppercase;text-align:left;width:100%}
 .s-t .shiny-text{margin-top:36px;display:inline-block;background:linear-gradient(90deg,#111 0%,#111 42%,rgba(255,255,255,0.9) 50%,#111 58%,#111 100%);background-size:400% 100%;background-clip:text;-webkit-background-clip:text;color:transparent;background-position:0 0;background-repeat:no-repeat;animation:shiny-text 12s cubic-bezier(0.6,0.6,0,1) infinite}
 @keyframes shiny-text{0%,90%,100%{background-position:0% 0}30%,60%{background-position:100% 0}}
 @keyframes shimmer-spin{to{transform:rotate(360deg)}}
@@ -224,7 +241,7 @@ html, body, #root {
 @keyframes spin-around{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 @keyframes flip{0%{transform:perspective(120px) scaleX(1)}25%{transform:perspective(120px) scaleX(0)}50%{transform:perspective(120px) scaleX(1)}75%{transform:perspective(120px) scaleX(0)}100%{transform:perspective(120px) scaleX(1)}}
 .loader-card{backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.s-sub{font-family:'Space Mono','Courier New','Courier',monospace;color:#666;font-size:13px;font-weight:400;line-height:1.5;text-align:left;width:100%;max-width:360px;margin-top:16px;margin-bottom:32px;text-transform:none;letter-spacing:0;margin-left:auto;margin-right:auto}
+.s-sub{font-family:'SF Pro Rounded',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#666;font-size:16px;font-weight:400;line-height:1.5;text-align:left;width:100%;max-width:360px;margin-top:16px;margin-bottom:32px;text-transform:none;letter-spacing:0;margin-left:auto;margin-right:auto}
 .s-stats{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:28px;margin-bottom:28px;width:100%}
 .s-stat{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:24px 20px;flex:1;min-width:120px;border:none;border-radius:16px;box-shadow:0 2px 0 rgba(0,0,0,0.15);transition:transform 0.2s ease}
 .s-stat:hover{transform:rotate(0deg)}
@@ -452,9 +469,25 @@ html, body, #root {
   .float-cube{display:none}
   .float-star1{width:20px;height:20px}
   .float-star2{display:none}
-  .play-wrap{padding:0 12px}
   .btn-howto-wrap{width:100%;flex-direction:column}
   .btn-howto-wrap .btn-go,.btn-howto-wrap .btn-howto{width:100%;min-width:0;max-width:none}
+}
+
+@media (max-width: 768px){
+  .S.P{height:100dvh;min-height:100dvh;overflow:hidden}
+  .play-wrap{padding:8px;gap:6px}
+  .B{aspect-ratio:4/3 !important}
+  .res-wrap{text-align:center;align-items:center}
+  .res-title{text-align:center;padding:0 20px}
+  .res-grid{grid-template-columns:repeat(5,56px);gap:6px}
+  .res-block{width:56px;height:56px}
+}
+@media (max-width: 480px){
+  .B{aspect-ratio:1/1 !important}
+}
+@media (max-width: 400px){
+  .res-grid{grid-template-columns:repeat(5,48px);gap:5px}
+  .res-block{width:48px;height:48px}
 }
 
 @media (max-width: 639px){
@@ -475,7 +508,7 @@ html, body, #root {
   .S{padding:48px}
   .P{padding:12px 16px}
   .s-t{font-size:68px;letter-spacing:0.05em}
-  .s-sub{max-width:360px;font-size:13px}
+  .s-sub{max-width:360px;font-size:16px}
   .s-stats{gap:12px;margin-bottom:28px}
   .s-stat{padding:24px 20px;border-radius:16px;flex:1;min-width:120px}
   .s-stat-v{font-size:36px;font-weight:900}
@@ -507,7 +540,7 @@ html, body, #root {
   .H-sc-n{font-size:26px}
   .rnd{padding:8px 14px;font-size:11px}
   .s-hero{max-width:1100px;gap:100px}
-  .s-t{font-size:72px;line-height:1.05;letter-spacing:0.02em;white-space:nowrap}
+  .s-t{font-size:72px;line-height:1.05;letter-spacing:0.02em;max-width:9ch}
   .s-sub{font-size:14px;line-height:1.55;max-width:420px}
   .btn-go{padding:18px 60px;font-size:16px;transition:all 0.2s ease}
   .btn-howto-wrap .btn-go,.btn-howto-wrap .btn-howto{width:250px;min-width:250px;max-width:250px;padding:18px 60px;font-size:16px}
@@ -531,7 +564,7 @@ html, body, #root {
 
 @media (min-width: 1440px){
   .s-hero{max-width:1200px;gap:120px}
-  .s-t{font-size:84px;white-space:nowrap}
+  .s-t{font-size:84px;max-width:9ch}
   .s-stat-v{font-size:52px}
 }
 
@@ -810,7 +843,7 @@ export default function AnimeGuesser() {
     e.preventDefault();
     if (!guess.trim() || result || !rounds) return;
     const n = guess.trim().toLowerCase();
-    if (rounds[round].accept.some(a => n === a)) endRound(true, calcScore(time, revealed.size));
+    if (rounds[round].accept.some(a => n === a)) endRound(true, calcScore(revealed.size, time, TIMER, TOTAL));
     else {
       setWrongMsg(WRONG[Math.floor(Math.random() * WRONG.length)](guess.trim()));
       setInputShake(true); setInputBorderFlash(true); setWrongToastSlide(true); setInpXShow(true);
@@ -838,7 +871,7 @@ export default function AnimeGuesser() {
   };
 
   const pct = (time / TIMER) * 100;
-  const maxPts = rounds ? Math.round(1000 - (revealed.size / TOTAL) * 900) : 1000;
+  const maxPts = rounds ? calcScore(revealed.size, time, TIMER, TOTAL) : 1000;
 
   // ===== START / LOADING =====
   if (screen === "start") return (
@@ -852,7 +885,7 @@ export default function AnimeGuesser() {
       <div className={loading ? "S S--loading" : "S"}>
         {loading ? (
           <div className="s-loading s-z">
-            <div className="loader-card" style={{width:48,height:48,borderRadius:8,overflow:'hidden',animation:'flip 1.2s ease-in-out infinite',margin:'0 auto 16px',boxShadow:'0 4px 20px rgba(200,230,0,0.2)'}}>
+            <div className="loader-card" style={{width:60,height:60,borderRadius:8,overflow:'hidden',animation:'flip 1.2s ease-in-out infinite',margin:'0 auto 16px',boxShadow:'0 4px 20px rgba(200,230,0,0.2)'}}>
               <img
                 key={loadImgIndex}
                 src={LOADING_IMAGES[loadImgIndex]}
@@ -904,12 +937,12 @@ export default function AnimeGuesser() {
                 <span className="modal-rule-badge">3</span>
                 <span className="modal-rule-text">Fewer tiles + faster = more points</span>
               </div>
-              <p className="modal-score-note">Fewer tiles revealed + faster guess = higher score. Max 1,000 points per round.</p>
+              <p className="modal-score-note">Fewer tiles revealed + faster guess = higher score. Max 1,300 points per round.</p>
             </div>
           </div>
         )}
         <div className="s-logo-wrap s-z">
-          <img src="/textmarklogo-aniguess.svg" alt="ANIGUESS°" style={{ height: 32, width: 'auto', display: 'block' }} />
+          <img src="/textmarklogo-aniguess.svg" alt="ANIGUESS°" style={{ height: 36, width: 'auto' }} />
         </div>
         <div className="s-hero s-z">
           <div className="s-hero-left">
