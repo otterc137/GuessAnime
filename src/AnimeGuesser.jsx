@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { submitScore, getTopScores } from './firebase';
+import { submitScore, getTopScores } from './supabase';
 
 // Anime-only: all entries are MAL anime IDs (TV/movie). Primary image from main anime endpoint (cover); supplemented by /pictures for variety.
 const ANIME_DB = [
@@ -862,7 +862,6 @@ export default function AnimeGuesser() {
   const [showRoundsModal, setShowRoundsModal] = useState(false);
   const [leaderboard, setLeaderboard] = useState(DEFAULT_LEADERBOARD);
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
-  const scoreSubmittedRef = useRef(false);
 
   const startGame = async () => {
     const replay = screen === "results" || screen === "playing";
@@ -950,60 +949,36 @@ export default function AnimeGuesser() {
   }, [screen]);
 
   useEffect(() => {
-    scoreSubmittedRef.current = scoreSubmitted;
-  }, [scoreSubmitted]);
-
-  useEffect(() => {
     if (screen === 'results') {
-      try {
-        getTopScores(10).then(scores => {
-          if (scores && scores.length > 0) {
-            const merged = [...scores];
-            let i = 0;
-            while (merged.length < 10 && i < DEFAULT_LEADERBOARD.length) {
-              merged.push(DEFAULT_LEADERBOARD[i]);
-              i++;
-            }
-            merged.sort((a, b) => b.score - a.score);
-            setLeaderboard(merged.slice(0, 10));
+      getTopScores(10).then(scores => {
+        if (scores && scores.length > 0) {
+          const merged = [...scores];
+          let i = 0;
+          while (merged.length < 10 && i < DEFAULT_LEADERBOARD.length) {
+            merged.push(DEFAULT_LEADERBOARD[i]);
+            i++;
           }
-          // If no scores, keep DEFAULT_LEADERBOARD (already in state)
-        }).catch(() => {
-          setLeaderboard(DEFAULT_LEADERBOARD);
-        });
-      } catch {
-        setLeaderboard(DEFAULT_LEADERBOARD);
-      }
+          merged.sort((a, b) => b.score - a.score);
+          setLeaderboard(merged.slice(0, 10));
+        }
+      }).catch(() => {});
     }
   }, [screen]);
 
-  // Ensure we never show an empty leaderboard on results (safeguard for race conditions)
-  useEffect(() => {
-    if (screen === 'results' && leaderboard.length === 0) {
-      setLeaderboard(DEFAULT_LEADERBOARD);
-    }
-  }, [screen, leaderboard.length]);
-
   useEffect(() => {
     if (screen === 'results' && !scoreSubmitted && total > 0) {
-      const playerEntry = {
-        id: 'me',
-        name: playerName || 'You',
-        score: total,
-        correct: results.filter(r => r.correct).length,
-        isMe: true,
-      };
-
-      const updated = [...leaderboard, playerEntry]
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 10);
-
-      setLeaderboard(updated);
-
-      submitScore(playerName, total, playerEntry.correct, avatar).catch(() => {});
+      const correctCount = results.filter(r => r.correct).length;
+      submitScore(playerName, total, correctCount);
       setScoreSubmitted(true);
+      setTimeout(() => {
+        getTopScores(10).then(scores => {
+          if (scores && scores.length > 0) {
+            setLeaderboard(scores.slice(0, 10));
+          }
+        }).catch(() => {});
+      }, 1000);
     }
-  }, [screen, scoreSubmitted, leaderboard]);
+  }, [screen, scoreSubmitted]);
 
   useEffect(() => {
     if (!result || screen !== 'playing') return;
@@ -1151,7 +1126,7 @@ export default function AnimeGuesser() {
   useEffect(() => { roundEndedRef.current = false; }, [round]);
 
   const nextRound = () => {
-    if (round >= rounds.length - 1) { setLeaderboard(DEFAULT_LEADERBOARD); setScreen("results"); setTimeout(() => setShowBar(true), 400); return; }
+    if (round >= rounds.length - 1) { setScreen("results"); setTimeout(() => setShowBar(true), 400); return; }
     setPrevRound(round);
     setTransitionPhase("out");
     setTimeout(() => {
