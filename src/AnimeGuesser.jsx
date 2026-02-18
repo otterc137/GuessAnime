@@ -573,7 +573,7 @@ html, body, #root {
 .round-score-pill.miss{background:#111;color:#F5F5F0}
 .leaderboard{width:100%;max-width:560px;margin:12px auto 0;background:#FFFFFF;border-radius:20px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 4px 24px rgba(0,0,0,0.06),0 1px 4px rgba(0,0,0,0.04),inset 0 2px 8px rgba(0,0,0,0.04),inset 0 -2px 6px rgba(0,0,0,0.02);overflow:hidden;padding:0;flex-shrink:0}
 .lb-header{position:relative;display:flex;align-items:center;justify-content:center;height:52px;padding:0;background:linear-gradient(180deg,#e8e8e4 0%,#d4d4d0 50%,#c4c4c0 100%);border-bottom:1px solid rgba(0,0,0,0.08);box-shadow:inset 0 1px 2px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.04);color:#2a2a2a;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;overflow:hidden}
-.lb-header-text{position:relative;z-index:20;padding:0 28px}
+.lb-header-text{position:relative;z-index:20;padding:0 28px;font-size:16px;text-shadow:0 1px 0 rgba(255,255,255,0.5),0 -1px 0 rgba(0,0,0,0.12),1px 1px 0 rgba(255,255,255,0.25)}
 .lb-header-flag{position:absolute;top:0;bottom:0;width:42%;pointer-events:none;z-index:0;background-repeat:no-repeat;background-size:cover}
 .lb-header-flag-left{left:-24px;background-image:url(/checker-left.svg);background-position:left center}
 .lb-header-flag-right{right:-24px;background-image:url(/checker-right.svg);background-position:right center}
