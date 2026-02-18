@@ -292,6 +292,19 @@ function getResultTitle(total) {
   return msgs[total % msgs.length];
 }
 
+const LEADERBOARD_ENCOURAGEMENT = [
+  "Daijoubu! Next round!",
+  "The protagonist always loses the first fight. Next time!",
+  "Power of friendship didn't kick in yet. Try again!",
+  "Even isekai protagonists get reincarnated. See you next run!",
+  "Genki dashite! You'll level up next run.",
+  "Not bad for a side character. Aim for main cast next!",
+  "The training arc continues. See you next round!",
+  "Plot armor was on cooldown. It'll be back.",
+  "Your waifu believes in you. Go again!",
+  "Nani?! Room to grow. Next round!",
+];
+
 const CSS = `
 html, body, #root {
   margin: 0;
@@ -315,7 +328,7 @@ html, body, #root {
   src:url('/fonts/BricolageGrotesque-Variable.ttf') format('truetype');
   font-weight:100 900;font-style:normal;font-display:swap;
 }
-.R{width:100%;min-width:100%;min-height:100vh;max-width:100vw;font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;background:#F5F5F0;color:var(--t);position:relative;overflow-x:hidden;border-top:3px solid #DEFF0A}
+.R{width:100%;min-width:100%;min-height:100vh;max-width:100vw;font-family:'Cabinet Grotesk','Helvetica Neue','Arial',sans-serif;background:#F5F5F0;color:var(--t);position:relative;overflow-x:hidden}
 .R,.R *{cursor:url('/pochita-cursor.png') 16 16,auto !important}
 
 .s-loading{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center}
@@ -502,28 +515,31 @@ html, body, #root {
 
 .S--results{min-height:100vh;max-height:100vh;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden}
 .S--results .res-wrap{flex:1;min-height:0;overflow-y:auto;padding-bottom:120px}
-.res-wrap{width:100%;max-width:800px;margin-left:auto;margin-right:auto;display:flex;flex-direction:column;align-items:center;padding:24px;box-sizing:border-box}
+.res-wrap{width:100%;max-width:800px;margin-left:auto;margin-right:auto;display:flex;flex-direction:column;align-items:center;padding:12px 24px 24px 24px;box-sizing:border-box}
 .res-profile{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:20px}
-.res-avatar{width:56px;height:56px;border-radius:50%;background:#E0E0D8;border:1.5px solid rgba(0,0,0,0);border-image:none;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;flex-shrink:0;transition:background 0.2s ease,border-color 0.2s ease,transform 0.2s ease}
+.res-avatar{width:56px;height:56px;border-radius:50%;background:rgba(235,235,229,1);border:1.5px solid rgba(0,0,0,0);border-image:none;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;flex-shrink:0;transition:background 0.2s ease,border-color 0.2s ease,transform 0.2s ease}
 .res-avatar:hover{background:#D5D5CC;border-color:rgba(0,0,0,0.12);transform:scale(1.04)}
 .res-avatar img{width:100%;height:100%;object-fit:cover}
 .res-avatar-icon{color:#999;font-size:24px;line-height:1;pointer-events:none;display:flex;align-items:center;justify-content:center}
-.res-avatar-icon svg{display:block}
+.res-avatar-icon svg{display:block;width:20px;height:20px}
 .res-avatar:hover .res-avatar-icon{color:#777}
 .res-name-input{background:transparent;border:none;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:center;color:#111;padding:0;width:100%;min-width:0;flex:1;outline:none}
 .res-name-input::placeholder{color:#999}
-.name-input-wrapper{display:flex;align-items:center;background:#FFFFFF;font-size:14px;border:1px solid rgba(153,153,153,0.05);border-image:none;border-radius:12px;padding:0 16px;max-width:min(220px,85%);width:100%;min-width:0;margin:0 auto;transition:border-color 0.2s,box-shadow 0.2s}
+.name-input-wrapper{position:relative;display:flex;align-items:center;justify-content:center;background:#FFFFFF;font-size:14px;border:1px solid rgba(153,153,153,0.05);border-image:none;border-radius:12px;padding:0 16px;max-width:min(320px,95%);width:100%;min-width:0;margin:0 auto;transition:border-color 0.2s,box-shadow 0.2s}
 .name-input-wrapper:focus-within{border-color:#C8E600;box-shadow:0 0 0 3px rgba(200,230,0,0.25)}
-.name-edit-icon{flex-shrink:0;margin-right:8px}
+.name-edit-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);flex-shrink:0;pointer-events:none}
 .name-input-wrapper:focus-within .name-edit-icon{stroke:#C8E600}
-.result-name-input{background:none;border:none;font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#111;text-align:center;padding:10px 0;outline:none;width:100%;min-width:0;caret-color:#C8E600;box-sizing:border-box}
+.result-name-input{background:none;border:none;font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#111;text-align:center;padding:10px 0;outline:none;width:100%;min-width:0;caret-color:#C8E600;box-sizing:border-box;padding-left:38px;padding-right:38px}
 .result-name-input::placeholder{color:#CCC;font-weight:500}
 .save-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#111;color:#C8E600;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:0.1em;padding:10px 24px;border-radius:9999px;z-index:200;animation:toastIn 0.3s ease,toastOut 0.3s ease 1.7s forwards;display:inline-flex;align-items:center;gap:8px}
 .save-toast-icon{font-size:20px;line-height:1}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes toastOut{from{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(-10px)}}
 .res-title{font-family:Gasoek;font-size:22px;text-transform:uppercase;color:#111;margin-bottom:8px;padding-bottom:12px}
-.res-score{font-family:'Cabinet Grotesk';font-size:64px;font-weight:900;line-height:1;background:linear-gradient(180deg,#111 0%,#2a2a2a 35%,#444 50%,#2a2a2a 65%,#111 100%);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+.res-score{font-family:'Cabinet Grotesk';font-size:64px;font-weight:900;line-height:1;padding-top:8px;background:linear-gradient(180deg,#111 0%,#2a2a2a 35%,#444 50%,#2a2a2a 65%,#111 100%);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+.res-rank-tag{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:5px 12px;border-radius:9999px;color:#3a3a38;background:linear-gradient(180deg,#e8e8e4 0%,#d4d4d0 50%,#c4c4c0 100%);border:1px solid rgba(0,0,0,0.06);box-shadow:inset 0 1px 2px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.04)}
+.res-rank-tag-icon{flex-shrink:0;vertical-align:middle}
+.res-encouragement{display:inline-block;margin-top:10px;padding:6px 14px;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.02em;color:#5a5a5a;text-align:center;line-height:1.35;border-radius:9999px;background:linear-gradient(180deg,#e8e8e4 0%,#d4d4d0 50%,#c4c4c0 100%);border:1px solid rgba(0,0,0,0.06);box-shadow:inset 0 1px 2px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.04)}
 .res-grid{display:grid;grid-template-columns:repeat(5,64px);gap:10px;justify-content:center;margin:20px auto;perspective:400px;position:relative}
 .res-grid::after{content:'';position:absolute;inset:-20px;background:radial-gradient(ellipse at center,rgba(222,255,10,0.08),transparent 70%);pointer-events:none;z-index:-1}
 .res-block{width:64px;height:64px;border-radius:10px;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d;transition:all 0.2s ease}
@@ -555,35 +571,47 @@ html, body, #root {
 .round-score-pill{padding:4px 12px;border-radius:9999px;font-size:12px;font-weight:900;font-family:'Space Mono',monospace}
 .round-score-pill.correct{background:#DEFF0A;color:#111}
 .round-score-pill.miss{background:#111;color:#F5F5F0}
-.leaderboard{width:100%;max-width:500px;margin:20px auto 0;background:#FFFFFF;border-radius:20px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 4px 24px rgba(0,0,0,0.06),0 1px 4px rgba(0,0,0,0.04),inset 0 2px 8px rgba(0,0,0,0.04),inset 0 -2px 6px rgba(0,0,0,0.02);overflow:hidden;padding:0}
-.lb-header{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 20px;background:#111;color:#F5F5F0;font-family:'Vina Sans',sans-serif;font-size:18px;text-transform:uppercase;letter-spacing:0.05em}
-.lb-podium{display:flex;justify-content:center;align-items:flex-end;gap:12px;padding:24px 16px 16px;background:linear-gradient(180deg,rgba(200,230,0,0.06) 0%,transparent 100%)}
+.leaderboard{width:100%;max-width:500px;margin:12px auto 0;background:#FFFFFF;border-radius:20px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 4px 24px rgba(0,0,0,0.06),0 1px 4px rgba(0,0,0,0.04),inset 0 2px 8px rgba(0,0,0,0.04),inset 0 -2px 6px rgba(0,0,0,0.02);overflow:hidden;padding:0;flex-shrink:0}
+.lb-header{display:flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:16px 20px;background:#111;color:#F5F5F0;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em}
+.lb-podium{display:flex;flex-direction:column;align-items:center;padding:4px 16px 16px;background:linear-gradient(180deg,rgba(200,230,0,0.06) 0%,transparent 100%)}
+.lb-podium-crown-wrap{display:flex;justify-content:center;margin-bottom:-4px}
+.lb-podium-row{display:flex;justify-content:center;align-items:flex-end;gap:16px}
 .lb-podium-item{display:flex;flex-direction:column;align-items:center;gap:4px}
 .lb-podium-item.first{order:2}
 .lb-podium-item.second{order:1}
 .lb-podium-item.third{order:3}
+.lb-podium-item-crown{display:flex;justify-content:center;margin-bottom:2px}
+.lb-podium-item-crown svg{display:block}
 .lb-podium-rank{font-size:24px;line-height:1}
+.lb-podium-score-bar{width:96px;border-radius:10px 10px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 8px 12px}
+.lb-podium-item.first{background-clip:unset;-webkit-background-clip:unset;color:rgba(17,17,17,1)}
+.lb-podium-item.first .lb-podium-score-bar{height:148px;background:linear-gradient(180deg,#FAF0C8 0%,#E8C547 40%,#D4A82A 70%,rgba(212,168,42,0.4) 88%,rgba(212,168,42,0) 100%) !important}
+.lb-podium-item.second .lb-podium-score-bar{height:128px;background:linear-gradient(180deg,#E8E8E8 0%,#CCCCCC 65%,rgba(204,204,204,0) 100%)}
+.lb-podium-item.third .lb-podium-score-bar{height:112px;background:linear-gradient(180deg,rgba(245,208,169,1) 0%,rgba(232,184,120,0) 100%,rgba(232,184,120,1) 60%)}
+.lb-podium-score-bar-top{display:flex;flex-direction:column;align-items:center;gap:4px}
+.lb-podium-rank-badge{display:inline-block;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.15em;line-height:1;padding:2px 6px;border-radius:9999px;background:rgba(0,0,0,0.2);color:#fff;border:1px solid rgba(0,0,0,0.25);text-shadow:0 1px 1px rgba(0,0,0,0.2)}
+.lb-podium-item.first .lb-podium-rank-badge{background:rgba(139,105,20,0.5);color:#fff;border:1px solid rgba(101,76,15,0.6)}
+.lb-podium-item.second .lb-podium-rank-badge{background:rgba(60,60,60,0.45);border-color:rgba(40,40,40,0.5)}
+.lb-podium-item.third .lb-podium-rank-badge{background:rgba(80,55,35,0.5);border-color:rgba(60,42,25,0.55)}
+.lb-podium-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.25);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cabinet Grotesk',sans-serif;font-size:11px;font-weight:800;color:rgba(0,0,0,0.6)}
+.lb-podium-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .lb-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.lb-podium-score-bar{width:80px;border-radius:10px 10px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:12px 8px 10px}
-.lb-podium-item.first .lb-podium-score-bar{height:100px;background:linear-gradient(180deg,#C8E600,#A8C200)}
-.lb-podium-item.second .lb-podium-score-bar{height:76px;background:linear-gradient(180deg,#E8E8E8,#CCCCCC)}
-.lb-podium-item.third .lb-podium-score-bar{height:60px;background:linear-gradient(180deg,#F5D0A9,#E8B878)}
-.lb-podium-name{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#111;text-transform:uppercase;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
-.lb-podium-score{font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:800;color:#111}
+.lb-podium-name{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;font-weight:700;color:#111;text-transform:uppercase;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.lb-podium-score{font-family:'Cabinet Grotesk',sans-serif;font-size:16px;line-height:24px;font-weight:800;color:#111;background:rgba(255,255,255,0.25);padding:2px 8px;border-radius:8px}
 .lb-list{padding:0 16px 16px}
 .lb-row{display:flex;align-items:center;padding:10px 12px;border-radius:10px;margin-bottom:4px;transition:background 0.2s}
 .lb-row.is-me{background:rgba(200,230,0,0.12)}
 .lb-rank{width:32px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#BBB;flex-shrink:0}
 .lb-name{flex:1;font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:600;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lb-row-score{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#666;flex-shrink:0}
+.lb-row-score{font-family:'Bricolage Grotesque';font-size:12px;font-weight:700;color:#666;flex-shrink:0}
 .results-footer{position:sticky;bottom:0;left:0;width:100%;padding:20px 0 24px;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:10;background:#F5F5F0;flex-shrink:0}
 .results-footer::before{content:'';position:absolute;bottom:100%;left:0;right:0;height:60px;background:linear-gradient(to bottom,rgba(245,245,240,0),rgba(245,245,240,1));pointer-events:none}
 .res-actions{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;max-width:800px;margin:0 auto;flex-wrap:wrap}
 .res-actions .btn-share,.res-actions .btn-play-again-outline{width:200px;min-width:200px;box-sizing:border-box}
-.btn-share{background:#DEFF0A;color:#111;border:none;border-radius:9999px;padding:14px 40px;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform 0.2s ease,box-shadow 0.2s ease,background 0.2s ease}
+.btn-share{background:#DEFF0A;color:#111;border:none;border-radius:9999px;padding:14px 40px;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform 0.2s ease,box-shadow 0.2s ease,background 0.2s ease}
 .btn-share:hover{background:#d4f000;transform:scale(1.03);box-shadow:0 4px 16px rgba(222,255,10,0.4)}
 .btn-share:active{transform:scale(0.98)}
-.btn-play-again-outline{background:transparent;border:1.5px solid #111;border-radius:9999px;padding:12px 36px;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#111;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;cursor:pointer;white-space:nowrap;transition:transform 0.2s ease,box-shadow 0.2s ease,background 0.2s ease;outline:none;box-shadow:none}
+.btn-play-again-outline{background:transparent;border:1.5px solid #111;border-radius:9999px;padding:12px 36px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#111;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;cursor:pointer;white-space:nowrap;transition:transform 0.2s ease,box-shadow 0.2s ease,background 0.2s ease;outline:none;box-shadow:none}
 .btn-play-again-outline:hover{background:rgba(0,0,0,0.06);border-color:#111;transform:scale(1.03);box-shadow:0 4px 16px rgba(0,0,0,0.12)}
 .btn-play-again-outline:focus,.btn-play-again-outline:focus-visible{outline:none !important;box-shadow:0 0 0 0 transparent}
 .btn-play-again-outline:active{transform:scale(0.98)}
@@ -870,6 +898,7 @@ export default function AnimeGuesser() {
   const [showRoundsModal, setShowRoundsModal] = useState(false);
   const [leaderboard, setLeaderboard] = useState(DEFAULT_LEADERBOARD);
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
+  const [podiumAvatarFailed, setPodiumAvatarFailed] = useState(new Set());
 
   const startGame = async () => {
     const replay = screen === "results" || screen === "playing";
@@ -918,6 +947,8 @@ export default function AnimeGuesser() {
   useEffect(() => {
     const saved = localStorage.getItem('aniguess-name');
     if (saved) setPlayerName(saved);
+    const savedAvatar = localStorage.getItem('aniguess-avatar');
+    if (savedAvatar) setAvatar(savedAvatar);
   }, []);
   const LOADING_TIPS = ["FEWER TILES = MORE POINTS", "SPEED RUN MODE: ON", "YOU KNOW YOUR ANIME", "REVEAL LESS, SCORE MORE", "IT'S IN THE EYES (AND HAIR)"];
   useEffect(() => {
@@ -946,6 +977,10 @@ export default function AnimeGuesser() {
   }, [loading]);
 
   useEffect(() => {
+    if (screen !== 'results') setPodiumAvatarFailed(new Set());
+  }, [screen]);
+
+  useEffect(() => {
     if (screen === 'results') {
       setShowConfetti(true);
       setConfettiPieces(genConfetti());
@@ -956,19 +991,28 @@ export default function AnimeGuesser() {
     }
   }, [screen]);
 
+  function normalizeLeaderboard(rows) {
+    return (rows || []).map((e, i) => ({
+      id: e?.id ?? `row-${i}`,
+      name: e?.name ?? 'Anonymous',
+      score: Number(e?.score) || 0,
+      correct: Number(e?.correct) || 0,
+      isMe: !!e?.isMe,
+    }));
+  }
+
   useEffect(() => {
     if (screen === 'results') {
       getTopScores(10).then(scores => {
-        if (scores && scores.length > 0) {
-          const merged = [...scores];
-          let i = 0;
-          while (merged.length < 10 && i < DEFAULT_LEADERBOARD.length) {
-            merged.push(DEFAULT_LEADERBOARD[i]);
-            i++;
-          }
-          merged.sort((a, b) => b.score - a.score);
-          setLeaderboard(merged.slice(0, 10));
+        const raw = scores && scores.length > 0 ? scores : [];
+        const merged = [...normalizeLeaderboard(raw)];
+        let i = 0;
+        while (merged.length < 10 && i < DEFAULT_LEADERBOARD.length) {
+          merged.push({ ...DEFAULT_LEADERBOARD[i] });
+          i++;
         }
+        merged.sort((a, b) => (b.score || 0) - (a.score || 0));
+        setLeaderboard(merged.slice(0, 10));
       }).catch(() => {});
     }
   }, [screen]);
@@ -980,9 +1024,15 @@ export default function AnimeGuesser() {
       setScoreSubmitted(true);
       setTimeout(() => {
         getTopScores(10).then(scores => {
-          if (scores && scores.length > 0) {
-            setLeaderboard(scores.slice(0, 10));
+          const raw = scores && scores.length > 0 ? scores : [];
+          const merged = [...normalizeLeaderboard(raw)];
+          let i = 0;
+          while (merged.length < 10 && i < DEFAULT_LEADERBOARD.length) {
+            merged.push({ ...DEFAULT_LEADERBOARD[i] });
+            i++;
           }
+          merged.sort((a, b) => (b.score || 0) - (a.score || 0));
+          setLeaderboard(merged.slice(0, 10));
         }).catch(() => {});
       }, 1000);
     }
@@ -1290,7 +1340,11 @@ export default function AnimeGuesser() {
       const file = e.target?.files?.[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = () => setAvatar(reader.result);
+      reader.onload = () => {
+        const dataUrl = reader.result;
+        setAvatar(dataUrl);
+        try { localStorage.setItem('aniguess-avatar', dataUrl); } catch (_) {}
+      };
       reader.readAsDataURL(file);
       e.target.value = "";
     };
@@ -1444,7 +1498,7 @@ export default function AnimeGuesser() {
               <div className="res-avatar" onClick={() => avatarInputRef.current?.click()} role="button" tabIndex={0} aria-label="Upload profile image" title="Click to upload image" onKeyDown={e => e.key === "Enter" && avatarInputRef.current?.click()}>
                 {avatar ? <img src={avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : (
                   <span className="res-avatar-icon" aria-hidden>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                       <circle cx="8.5" cy="8.5" r="1.5" />
                       <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
@@ -1476,6 +1530,15 @@ export default function AnimeGuesser() {
             </div>
             <h1 className="res-title">{getResultTitle(total)}</h1>
             <div className="res-score">{total.toLocaleString()}</div>
+            {leaderboard.length > 0 ? (() => {
+              const rank = 1 + leaderboard.filter(e => (e.score ?? 0) > total).length;
+              const onLeaderboard = rank <= Math.min(10, leaderboard.length);
+              return onLeaderboard
+                ? <span className="res-rank-tag"><svg className="res-rank-tag-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M12 19V5M5 12l7-7 7 7"/></svg>Rank #{rank}</span>
+                : <span className="res-encouragement">{LEADERBOARD_ENCOURAGEMENT[total % LEADERBOARD_ENCOURAGEMENT.length]}</span>;
+            })() : (
+              <span className="res-encouragement">{LEADERBOARD_ENCOURAGEMENT[total % LEADERBOARD_ENCOURAGEMENT.length]}</span>
+            )}
             <div className="res-grid">
               {displayResults.map((r, i) => (
                 <div
@@ -1499,14 +1562,7 @@ export default function AnimeGuesser() {
             </button>
             <div className="leaderboard">
               <div className="lb-header">
-                <svg width="18" height="18" viewBox="0 0 32 32" fill="none" style={{marginRight: 8}}>
-                  <path d="M8 4h16v8c0 5-3.5 8-8 8s-8-3-8-8V4z" fill="#C8E600"/>
-                  <path d="M10 5h5v7c0 2-1 4-2.5 4S10 14 10 12V5z" fill="rgba(255,255,255,0.2)"/>
-                  <rect x="8" y="3" width="16" height="2" rx="1" fill="#E0FF66"/>
-                  <rect x="12" y="20" width="8" height="3" rx="1" fill="#111"/>
-                  <rect x="10" y="23" width="12" height="2" rx="1" fill="#111"/>
-                </svg>
-                TOP 10
+                Leaderboard
               </div>
               {leaderboard.length === 0 ? (
                 <div style={{padding: '24px 16px', textAlign: 'center'}}>
@@ -1543,7 +1599,7 @@ export default function AnimeGuesser() {
                             </defs>
                           </svg>
                         ) : i === 1 ? (
-                          <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+                          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                             <ellipse cx="16" cy="29" rx="7" ry="1.5" fill="rgba(0,0,0,0.06)"/>
                             <path d="M16 4l3.5 7 7.5 1.2-5.5 5.3 1.3 7.5-6.8-3.5-6.8 3.5 1.3-7.5L5 12.2l7.5-1.2z" fill="#B0B0B0" transform="translate(0.5, 0.8)"/>
                             <path d="M16 4l3.5 7 7.5 1.2-5.5 5.3 1.3 7.5-6.8-3.5-6.8 3.5 1.3-7.5L5 12.2l7.5-1.2z" fill="#DDD"/>
@@ -1551,7 +1607,7 @@ export default function AnimeGuesser() {
                             <path d="M16 9l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9-3.6 1.9.7-4-2.9-2.8 4-.6z" fill="none" stroke="#BBB" strokeWidth="0.5"/>
                           </svg>
                         ) : (
-                          <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+                          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                             <ellipse cx="16" cy="29" rx="6" ry="1.2" fill="rgba(0,0,0,0.06)"/>
                             <path d="M16 3L26 10v12l-10 7-10-7V10z" fill="#C4944A" transform="translate(0.4, 0.6)"/>
                             <path d="M16 3L26 10v12l-10 7-10-7V10z" fill="#F0C68B"/>
@@ -1563,72 +1619,89 @@ export default function AnimeGuesser() {
                         )}
                       </div>
                       <span className="lb-name">{entry.name || 'Anonymous'}</span>
-                      <span className="lb-row-score">{entry.score.toLocaleString()}</span>
+                      <span className="lb-row-score">{(entry.score ?? 0).toLocaleString()}</span>
                     </div>
                   ))}
                 </div>
               ) : (
                 <>
                   <div className="lb-podium">
-                    {[1, 0, 2].map(i => (
-                      <div className={`lb-podium-item ${['first','second','third'][i]}`} key={leaderboard[i].id}>
-                        <div className="lb-icon">
-                          {i === 1 ? (
-                            <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-                              <ellipse cx="16" cy="30" rx="8" ry="1.5" fill="rgba(0,0,0,0.08)"/>
-                              <rect x="9" y="24" width="14" height="3" rx="1.5" fill="#111" />
-                              <rect x="9" y="24" width="14" height="1.5" rx="0.75" fill="#333" />
-                              <rect x="13" y="20" width="6" height="5" rx="1" fill="#111"/>
-                              <rect x="13.5" y="20" width="2.5" height="4" rx="0.5" fill="rgba(255,255,255,0.08)"/>
-                              <path d="M7 4h18v10c0 5-4 8-9 8s-9-3-9-8V4z" fill="#C8E600"/>
-                              <path d="M7 4h18v10c0 5-4 8-9 8s-9-3-9-8V4z" fill="url(#trophy-grad)"/>
-                              <path d="M9 5h6v8c0 3-1.5 5-3 5s-3-2-3-5V5z" fill="rgba(255,255,255,0.25)"/>
-                              <rect x="7" y="3" width="18" height="2.5" rx="1.25" fill="#C8E600"/>
-                              <rect x="7" y="3" width="18" height="1.2" rx="0.6" fill="#E0FF66"/>
-                              <path d="M7 7H4a1 1 0 00-1 1v3a4 4 0 004 4V7z" fill="#A8C200"/>
-                              <path d="M5 8h1v5a3 3 0 01-2.5-3V9a1 1 0 011.5-1z" fill="rgba(255,255,255,0.15)"/>
-                              <path d="M25 7h3a1 1 0 011 1v3a4 4 0 01-4 4V7z" fill="#A8C200"/>
-                              <path d="M16 8l1.5 3 3.5.5-2.5 2.5.5 3.5-3-1.5-3 1.5.5-3.5L11 11.5l3.5-.5z" fill="#111" opacity="0.15"/>
-                              <defs>
-                                <linearGradient id="trophy-grad" x1="7" y1="4" x2="25" y2="22">
-                                  <stop offset="0%" stopColor="rgba(255,255,255,0.2)"/>
-                                  <stop offset="100%" stopColor="rgba(0,0,0,0.1)"/>
-                                </linearGradient>
-                              </defs>
-                            </svg>
-                          ) : i === 0 ? (
-                            <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-                              <ellipse cx="16" cy="29" rx="7" ry="1.5" fill="rgba(0,0,0,0.06)"/>
-                              <path d="M16 4l3.5 7 7.5 1.2-5.5 5.3 1.3 7.5-6.8-3.5-6.8 3.5 1.3-7.5L5 12.2l7.5-1.2z" fill="#B0B0B0" transform="translate(0.5, 0.8)"/>
-                              <path d="M16 4l3.5 7 7.5 1.2-5.5 5.3 1.3 7.5-6.8-3.5-6.8 3.5 1.3-7.5L5 12.2l7.5-1.2z" fill="#DDD"/>
-                              <path d="M16 6l2 4.5 5 .8-3.5 3.5.8 5-4.3-2.3V6z" fill="rgba(255,255,255,0.35)"/>
-                              <path d="M16 9l1.8 3.6 4 .6-2.9 2.8.7 4-3.6-1.9-3.6 1.9.7-4-2.9-2.8 4-.6z" fill="none" stroke="#BBB" strokeWidth="0.5"/>
-                            </svg>
-                          ) : (
-                            <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-                              <ellipse cx="16" cy="29" rx="6" ry="1.2" fill="rgba(0,0,0,0.06)"/>
-                              <path d="M16 3L26 10v12l-10 7-10-7V10z" fill="#C4944A" transform="translate(0.4, 0.6)"/>
-                              <path d="M16 3L26 10v12l-10 7-10-7V10z" fill="#F0C68B"/>
-                              <path d="M16 3L6 10v12l10 7V3z" fill="rgba(255,255,255,0.15)"/>
-                              <path d="M16 3L26 10 16 12 6 10z" fill="rgba(255,255,255,0.25)"/>
-                              <path d="M16 8l5 3.5v7L16 22l-5-3.5v-7z" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.8"/>
-                              <circle cx="12" cy="10" r="1.5" fill="rgba(255,255,255,0.4)"/>
-                            </svg>
-                          )}
-                        </div>
-                        <div className="lb-podium-score-bar">
-                          <span className="lb-podium-score">{leaderboard[i].score.toLocaleString()}</span>
-                        </div>
-                        <span className="lb-podium-name">{leaderboard[i].name || 'Anonymous'}</span>
-                      </div>
-                    ))}
+                    <div className="lb-podium-crown-wrap">
+                      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden>
+                        <path d="M5 22h22v4H5v-4z" fill="url(#crown-top-band)" stroke="rgba(0,0,0,0.08)" strokeWidth="0.5"/>
+                        <path d="M8 22V14l4 3 4-6 4 6 4-3v8H8z" fill="url(#crown-top-main)"/>
+                        <path d="M8 22V14l4 3 4-6v-2l-2 4-2-2-2 4v2z" fill="rgba(255,255,255,0.25)"/>
+                        <path d="M16 6l1.5 5 5 .5-4 3.5 1 5-3.5-2.5-3.5 2.5 1-5-4-3.5 5-.5 1.5-5z" fill="url(#crown-top-jewel)"/>
+                        <circle cx="16" cy="8" r="1.2" fill="rgba(255,255,255,0.5)"/>
+                        <defs>
+                          <linearGradient id="crown-top-band" x1="5" y1="22" x2="27" y2="26"><stop offset="0%" stopColor="#B8860B"/><stop offset="50%" stopColor="#D4A82A"/><stop offset="100%" stopColor="#8B6914"/></linearGradient>
+                          <linearGradient id="crown-top-main" x1="8" y1="8" x2="24" y2="24"><stop offset="0%" stopColor="#F5E6A3"/><stop offset="40%" stopColor="#E8C547"/><stop offset="100%" stopColor="#8B6914"/></linearGradient>
+                          <linearGradient id="crown-top-jewel" x1="12" y1="4" x2="20" y2="14"><stop offset="0%" stopColor="#FFF9E6"/><stop offset="100%" stopColor="#D4A82A"/></linearGradient>
+                        </defs>
+                      </svg>
+                    </div>
+                    <div className="lb-podium-row">
+                      {[1, 0, 2].map(i => {
+                        const entry = leaderboard[i];
+                        const place = ['first', 'second', 'third'][i];
+                        const badgeNum = { first: 1, second: 2, third: 3 }[place];
+                        const isCurrentPlayer = (entry.name || '').trim() === (playerName || '').trim() && (entry.score ?? 0) === total;
+                        const avatarSrc = isCurrentPlayer && avatar ? avatar : null;
+                        const showAvatar = avatarSrc && !podiumAvatarFailed.has(entry.id);
+                        const initial = (entry.name || 'A').trim().charAt(0).toUpperCase();
+                        return (
+                          <div className={`lb-podium-item ${place}`} key={entry.id}>
+                            {place === 'second' && (
+                              <div className="lb-podium-item-crown" aria-hidden>
+                                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                                  <path d="M5 22h22v4H5v-4z" fill="url(#crown-silver-band)"/>
+                                  <path d="M8 22V14l4 3 4-6 4 6 4-3v8H8z" fill="url(#crown-silver-main)"/>
+                                  <path d="M8 22V14l4 3 4-6v-2l-2 4-2-2-2 4v2z" fill="rgba(255,255,255,0.4)"/>
+                                  <path d="M16 6l1.5 5 5 .5-4 3.5 1 5-3.5-2.5-3.5 2.5 1-5-4-3.5 5-.5 1.5-5z" fill="url(#crown-silver-top)"/>
+                                  <defs>
+                                    <linearGradient id="crown-silver-band" x1="5" y1="22" x2="27" y2="26"><stop offset="0%" stopColor="#888"/><stop offset="50%" stopColor="#BBB"/><stop offset="100%" stopColor="#777"/></linearGradient>
+                                    <linearGradient id="crown-silver-main" x1="8" y1="8" x2="24" y2="24"><stop offset="0%" stopColor="#DDD"/><stop offset="40%" stopColor="#B0B0B0"/><stop offset="100%" stopColor="#777"/></linearGradient>
+                                    <linearGradient id="crown-silver-top" x1="12" y1="4" x2="20" y2="14"><stop offset="0%" stopColor="#FFF"/><stop offset="100%" stopColor="#AAA"/></linearGradient>
+                                  </defs>
+                                </svg>
+                              </div>
+                            )}
+                            {place === 'third' && (
+                              <div className="lb-podium-item-crown" aria-hidden>
+                                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                                  <path d="M5 22h22v4H5v-4z" fill="url(#crown-bronze-band)"/>
+                                  <path d="M8 22V14l4 3 4-6 4 6 4-3v8H8z" fill="url(#crown-bronze-main)"/>
+                                  <path d="M8 22V14l4 3 4-6v-2l-2 4-2-2-2 4v2z" fill="rgba(255,255,255,0.3)"/>
+                                  <path d="M16 6l1.5 5 5 .5-4 3.5 1 5-3.5-2.5-3.5 2.5 1-5-4-3.5 5-.5 1.5-5z" fill="url(#crown-bronze-top)"/>
+                                  <defs>
+                                    <linearGradient id="crown-bronze-band" x1="5" y1="22" x2="27" y2="26"><stop offset="0%" stopColor="#8B6914"/><stop offset="50%" stopColor="#C49420"/><stop offset="100%" stopColor="#6B5412"/></linearGradient>
+                                    <linearGradient id="crown-bronze-main" x1="8" y1="8" x2="24" y2="24"><stop offset="0%" stopColor="#F0C68B"/><stop offset="40%" stopColor="#D4A82A"/><stop offset="100%" stopColor="#8B6914"/></linearGradient>
+                                    <linearGradient id="crown-bronze-top" x1="12" y1="4" x2="20" y2="14"><stop offset="0%" stopColor="#FFF9E6"/><stop offset="100%" stopColor="#C49420"/></linearGradient>
+                                  </defs>
+                                </svg>
+                              </div>
+                            )}
+                            <div className="lb-podium-score-bar">
+                              <div className="lb-podium-score-bar-top">
+                                <span className="lb-podium-rank-badge">#{badgeNum}</span>
+                                <div className="lb-podium-avatar">
+                                  {showAvatar ? <img src={avatarSrc} alt="" onError={() => setPodiumAvatarFailed(s => new Set([...s, entry.id]))} /> : <span aria-hidden>{initial}</span>}
+                                </div>
+                              </div>
+                              <span className="lb-podium-score">{(entry.score ?? 0).toLocaleString()}</span>
+                            </div>
+                            <span className="lb-podium-name">{entry.name || 'Anonymous'}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                   <div className="lb-list">
                     {leaderboard.slice(3).map((entry, i) => (
                       <div className={`lb-row ${entry.isMe ? 'is-me' : ''}`} key={entry.id}>
                         <span className="lb-rank">#{i + 4}</span>
                         <span className="lb-name">{entry.name || 'Anonymous'}</span>
-                        <span className="lb-row-score">{entry.score.toLocaleString()}</span>
+                        <span className="lb-row-score">{(entry.score ?? 0).toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
