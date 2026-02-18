@@ -514,7 +514,7 @@ html, body, #root {
 .ht{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-align:center;font-size:10px;color:#ccc;margin-top:6px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em}
 
 .S--results{min-height:100vh;max-height:100vh;display:flex;flex-direction:column;justify-content:flex-start;overflow:hidden}
-.S--results .res-wrap{flex:1;min-height:0;overflow-y:auto;padding-bottom:120px}
+.S--results .res-wrap{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:120px}
 .res-wrap{width:100%;max-width:800px;margin-left:auto;margin-right:auto;display:flex;flex-direction:column;align-items:center;padding:12px 24px 24px 24px;box-sizing:border-box}
 .res-profile{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:20px}
 .res-avatar{width:56px;height:56px;border-radius:50%;background:rgba(235,235,229,1);border:1.5px solid rgba(0,0,0,0);border-image:none;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;flex-shrink:0;transition:background 0.2s ease,border-color 0.2s ease,transform 0.2s ease}
@@ -571,11 +571,15 @@ html, body, #root {
 .round-score-pill{padding:4px 12px;border-radius:9999px;font-size:12px;font-weight:900;font-family:'Space Mono',monospace}
 .round-score-pill.correct{background:#DEFF0A;color:#111}
 .round-score-pill.miss{background:#111;color:#F5F5F0}
-.leaderboard{width:100%;max-width:500px;margin:12px auto 0;background:#FFFFFF;border-radius:20px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 4px 24px rgba(0,0,0,0.06),0 1px 4px rgba(0,0,0,0.04),inset 0 2px 8px rgba(0,0,0,0.04),inset 0 -2px 6px rgba(0,0,0,0.02);overflow:hidden;padding:0;flex-shrink:0}
-.lb-header{display:flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:16px 20px;background:#111;color:#F5F5F0;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em}
-.lb-podium{display:flex;flex-direction:column;align-items:center;padding:4px 16px 16px;background:linear-gradient(180deg,rgba(200,230,0,0.06) 0%,transparent 100%)}
+.leaderboard{width:100%;max-width:560px;margin:12px auto 0;background:#FFFFFF;border-radius:20px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 4px 24px rgba(0,0,0,0.06),0 1px 4px rgba(0,0,0,0.04),inset 0 2px 8px rgba(0,0,0,0.04),inset 0 -2px 6px rgba(0,0,0,0.02);overflow:hidden;padding:0;flex-shrink:0}
+.lb-header{position:relative;display:flex;align-items:center;justify-content:center;height:52px;padding:0;background:linear-gradient(180deg,#e8e8e4 0%,#d4d4d0 50%,#c4c4c0 100%);border-bottom:1px solid rgba(0,0,0,0.08);box-shadow:inset 0 1px 2px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.04);color:#2a2a2a;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;overflow:hidden}
+.lb-header-text{position:relative;z-index:20;padding:0 28px}
+.lb-header-flag{position:absolute;top:0;bottom:0;width:42%;pointer-events:none;z-index:0;background-repeat:no-repeat;background-size:cover}
+.lb-header-flag-left{left:-24px;background-image:url(/checker-left.svg);background-position:left center}
+.lb-header-flag-right{right:-24px;background-image:url(/checker-right.svg);background-position:right center}
+.lb-podium{display:flex;flex-direction:column;align-items:center;padding:4px 12px 16px;background:linear-gradient(180deg,rgba(200,230,0,0.06) 0%,transparent 100%);min-width:0}
 .lb-podium-crown-wrap{display:flex;justify-content:center;margin-bottom:-4px}
-.lb-podium-row{display:flex;justify-content:center;align-items:flex-end;gap:16px}
+.lb-podium-row{display:flex;justify-content:center;align-items:flex-end;gap:16px;min-width:0}
 .lb-podium-item{display:flex;flex-direction:column;align-items:center;gap:4px}
 .lb-podium-item.first{order:2}
 .lb-podium-item.second{order:1}
@@ -583,13 +587,17 @@ html, body, #root {
 .lb-podium-item-crown{display:flex;justify-content:center;margin-bottom:2px}
 .lb-podium-item-crown svg{display:block}
 .lb-podium-rank{font-size:24px;line-height:1}
-.lb-podium-score-bar{width:96px;border-radius:10px 10px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 8px 12px}
+.lb-podium-score-bar{position:relative;width:96px;border-radius:10px 10px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 8px 12px;overflow:hidden}
+.lb-podium-score-bar::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 0%,transparent 35%,rgba(255,255,255,0.4) 50%,transparent 65%,transparent 100%);background-size:300% 100%;animation:lbShimmer 5s ease-in-out infinite;border-radius:inherit}
+@keyframes lbShimmer{0%,100%{background-position:150% 0}50%{background-position:-150% 0}}
 .lb-podium-item.first{background-clip:unset;-webkit-background-clip:unset;color:rgba(17,17,17,1)}
-.lb-podium-item.first .lb-podium-score-bar{height:148px;background:linear-gradient(180deg,#FAF0C8 0%,#E8C547 40%,#D4A82A 70%,rgba(212,168,42,0.4) 88%,rgba(212,168,42,0) 100%) !important}
+.lb-podium-item.first .lb-podium-score-bar{height:148px;background:linear-gradient(180deg,#FBF6E4 0%,#F6EDD0 22%,#EFE4B8 45%,#E6D898 68%,#DFCC78 85%,rgba(223,204,120,0.45) 93%,rgba(223,204,120,0) 100%) !important}
 .lb-podium-item.second .lb-podium-score-bar{height:128px;background:linear-gradient(180deg,#E8E8E8 0%,#CCCCCC 65%,rgba(204,204,204,0) 100%)}
+.lb-podium-item.second .lb-podium-score-bar::after{animation-delay:0.8s}
 .lb-podium-item.third .lb-podium-score-bar{height:112px;background:linear-gradient(180deg,rgba(245,208,169,1) 0%,rgba(232,184,120,0) 100%,rgba(232,184,120,1) 60%)}
-.lb-podium-score-bar-top{display:flex;flex-direction:column;align-items:center;gap:4px}
-.lb-podium-rank-badge{display:inline-block;font-family:'Space Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.15em;line-height:1;padding:2px 6px;border-radius:9999px;background:rgba(0,0,0,0.2);color:#fff;border:1px solid rgba(0,0,0,0.25);text-shadow:0 1px 1px rgba(0,0,0,0.2)}
+.lb-podium-item.third .lb-podium-score-bar::after{animation-delay:1.6s}
+.lb-podium-score-bar-top{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.lb-podium-rank-badge{display:inline-block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.15em;line-height:1;padding:2px 6px;border-radius:9999px;background:rgba(0,0,0,0.2);color:#fff;border:1px solid rgba(0,0,0,0.25);text-shadow:0 1px 1px rgba(0,0,0,0.2)}
 .lb-podium-item.first .lb-podium-rank-badge{background:rgba(139,105,20,0.5);color:#fff;border:1px solid rgba(101,76,15,0.6)}
 .lb-podium-item.second .lb-podium-rank-badge{background:rgba(60,60,60,0.45);border-color:rgba(40,40,40,0.5)}
 .lb-podium-item.third .lb-podium-rank-badge{background:rgba(80,55,35,0.5);border-color:rgba(60,42,25,0.55)}
@@ -597,9 +605,10 @@ html, body, #root {
 .lb-podium-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .lb-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .lb-podium-name{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;font-weight:700;color:#111;text-transform:uppercase;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
-.lb-podium-score{font-family:'Cabinet Grotesk',sans-serif;font-size:16px;line-height:24px;font-weight:800;color:#111;background:rgba(255,255,255,0.25);padding:2px 8px;border-radius:8px}
-.lb-list{padding:0 16px 16px}
-.lb-row{display:flex;align-items:center;padding:10px 12px;border-radius:10px;margin-bottom:4px;transition:background 0.2s}
+.lb-podium-score{position:relative;z-index:1;font-family:'Cabinet Grotesk',sans-serif;font-size:16px;line-height:24px;font-weight:800;color:#111;background:rgba(255,255,255,0.25);padding:2px 8px;border-radius:8px}
+.lb-list{padding:0 12px 16px}
+.lb-row{position:relative;display:flex;align-items:center;padding:10px 12px;border-radius:10px;margin-bottom:4px;transition:background 0.2s}
+.lb-row:not(:last-child)::after{content:'';position:absolute;bottom:0;left:12px;right:12px;height:1px;background:rgba(0,0,0,0.06)}
 .lb-row.is-me{background:rgba(200,230,0,0.12)}
 .lb-rank{width:32px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#BBB;flex-shrink:0}
 .lb-name{flex:1;font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:600;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -654,8 +663,41 @@ html, body, #root {
   .res-title{text-align:center;padding:0 20px}
   .res-grid{grid-template-columns:repeat(5,56px);gap:6px}
   .res-block{width:56px;height:56px}
+  .leaderboard{max-width:100%}
+  .lb-header-flag{width:40%}
+  .lb-podium{padding:8px 8px 16px}
+  .lb-podium-row{gap:12px}
+  .lb-podium-score-bar{width:80px;padding:8px 6px 10px}
+  .lb-podium-item.first .lb-podium-score-bar{height:120px}
+  .lb-podium-item.second .lb-podium-score-bar{height:104px}
+  .lb-podium-item.third .lb-podium-score-bar{height:92px}
+  .lb-podium-name{max-width:80px;font-size:11px}
+  .lb-podium-avatar{width:28px;height:28px;font-size:10px}
+  .lb-podium-rank-badge{font-size:10px;padding:2px 5px}
+  .lb-podium-score{font-size:14px;padding:2px 6px}
+  .lb-podium-item-crown svg{width:28px;height:28px}
+}
+@media (min-width: 394px) and (max-width: 479px){
+  .lb-podium{padding:8px 8px 14px}
+  .lb-podium-row{gap:12px}
+  .lb-podium-score-bar{width:84px;padding:8px 6px 10px}
+  .lb-podium-item.first .lb-podium-score-bar{height:126px}
+  .lb-podium-item.second .lb-podium-score-bar{height:108px}
+  .lb-podium-item.third .lb-podium-score-bar{height:96px}
+  .lb-podium-name{max-width:84px}
+}
+@media (min-width: 480px) and (max-width: 767px){
+  .lb-podium{padding:8px 10px 16px}
+  .lb-podium-row{gap:14px}
+  .lb-podium-score-bar{width:88px;padding:9px 7px 11px}
+  .lb-podium-item.first .lb-podium-score-bar{height:132px}
+  .lb-podium-item.second .lb-podium-score-bar{height:114px}
+  .lb-podium-item.third .lb-podium-score-bar{height:100px}
+  .lb-podium-name{max-width:88px;font-size:11px}
 }
 @media (max-width: 480px){
+  .lb-header-flag{width:28%}
+  .lb-header-text{padding:0 20px}
   .start-buttons{flex-direction:column;width:100%}
   .start-buttons .btn,.start-buttons .btn-howto{width:100%}
   .title-line2{white-space:normal}
@@ -666,8 +708,21 @@ html, body, #root {
   .B{aspect-ratio:1/1 !important}
 }
 @media (max-width: 400px){
+  .lb-header-flag{width:24%}
+  .lb-header-text{padding:0 16px}
   .res-grid{grid-template-columns:repeat(5,48px);gap:5px}
   .res-block{width:48px;height:48px}
+  .lb-podium{padding:8px 4px 14px}
+  .lb-podium-row{gap:10px}
+  .lb-podium-score-bar{width:70px;padding:6px 4px 8px}
+  .lb-podium-item.first .lb-podium-score-bar{height:100px}
+  .lb-podium-item.second .lb-podium-score-bar{height:88px}
+  .lb-podium-item.third .lb-podium-score-bar{height:76px}
+  .lb-podium-name{max-width:70px;font-size:10px}
+  .lb-podium-avatar{width:24px;height:24px;font-size:9px}
+  .lb-podium-rank-badge{font-size:9px;padding:1px 4px}
+  .lb-podium-score{font-size:12px;padding:1px 4px}
+  .lb-podium-item-crown svg{width:24px;height:24px}
 }
 
 @media (max-width: 639px){
@@ -723,6 +778,20 @@ html, body, #root {
   .res-block{width:80px;height:80px}
 }
 
+@media (min-width: 633px){
+  .leaderboard{max-width:600px}
+  .lb-podium{padding:10px 24px 28px}
+  .lb-podium-row{gap:24px}
+  .lb-podium-score-bar{width:120px;padding:12px 10px 8px}
+  .lb-podium-item.first .lb-podium-score-bar{height:172px}
+  .lb-podium-item.second .lb-podium-score-bar{height:148px}
+  .lb-podium-item.third .lb-podium-score-bar{height:128px}
+  .lb-podium-name{max-width:120px;font-size:13px}
+  .lb-podium-avatar{width:38px;height:38px;font-size:12px}
+  .lb-podium-rank-badge{font-size:11px;padding:3px 8px}
+  .lb-podium-score{font-size:18px;padding:3px 10px}
+  .lb-podium-item-crown svg{width:38px;height:38px}
+}
 @media (min-width: 1024px){
   .start-content{flex-direction:row;align-items:center;gap:80px}
   .start-left{align-items:flex-start;text-align:left}
@@ -733,6 +802,19 @@ html, body, #root {
   .I{max-width:100%}
   .play-wrap{max-width:900px}
   .res-wrap{max-width:900px}
+  .leaderboard{max-width:640px}
+  .lb-podium{padding:12px 28px 32px}
+  .lb-podium-row{gap:28px}
+  .lb-podium-score-bar{width:132px;padding:14px 12px 16px}
+  .lb-podium-item.first .lb-podium-score-bar{height:188px}
+  .lb-podium-item.second .lb-podium-score-bar{height:162px}
+  .lb-podium-item.third .lb-podium-score-bar{height:140px}
+  .lb-podium-name{max-width:132px;font-size:14px}
+  .lb-podium-avatar{width:42px;height:42px;font-size:13px}
+  .lb-podium-rank-badge{font-size:12px;padding:3px 8px}
+  .lb-podium-score{font-size:19px;padding:4px 12px}
+  .lb-podium-item-crown svg{width:42px;height:42px}
+  .lb-row-score{font-size:14px}
   .res-actions{max-width:900px}
   .topbar{max-width:900px;margin-left:auto;margin-right:auto}
   .H-sc-n{font-size:26px}
@@ -998,6 +1080,7 @@ export default function AnimeGuesser() {
       score: Number(e?.score) || 0,
       correct: Number(e?.correct) || 0,
       isMe: !!e?.isMe,
+      avatar_url: e?.avatar_url ?? null,
     }));
   }
 
@@ -1020,21 +1103,22 @@ export default function AnimeGuesser() {
   useEffect(() => {
     if (screen === 'results' && !scoreSubmitted && total > 0) {
       const correctCount = results.filter(r => r.correct).length;
-      submitScore(playerName, total, correctCount);
       setScoreSubmitted(true);
-      setTimeout(() => {
-        getTopScores(10).then(scores => {
-          const raw = scores && scores.length > 0 ? scores : [];
-          const merged = [...normalizeLeaderboard(raw)];
-          let i = 0;
-          while (merged.length < 10 && i < DEFAULT_LEADERBOARD.length) {
-            merged.push({ ...DEFAULT_LEADERBOARD[i] });
-            i++;
-          }
-          merged.sort((a, b) => (b.score || 0) - (a.score || 0));
-          setLeaderboard(merged.slice(0, 10));
-        }).catch(() => {});
-      }, 1000);
+      submitScore(playerName, total, correctCount, avatar || undefined).then(() => {
+        setTimeout(() => {
+          getTopScores(10).then(scores => {
+            const raw = scores && scores.length > 0 ? scores : [];
+            const merged = [...normalizeLeaderboard(raw)];
+            let i = 0;
+            while (merged.length < 10 && i < DEFAULT_LEADERBOARD.length) {
+              merged.push({ ...DEFAULT_LEADERBOARD[i] });
+              i++;
+            }
+            merged.sort((a, b) => (b.score || 0) - (a.score || 0));
+            setLeaderboard(merged.slice(0, 10));
+          }).catch(() => {});
+        }, 1000);
+      });
     }
   }, [screen, scoreSubmitted]);
 
@@ -1562,7 +1646,9 @@ export default function AnimeGuesser() {
             </button>
             <div className="leaderboard">
               <div className="lb-header">
-                Leaderboard
+                <div className="lb-header-flag lb-header-flag-left" aria-hidden />
+                <span className="lb-header-text">Leaderboard</span>
+                <div className="lb-header-flag lb-header-flag-right" aria-hidden />
               </div>
               {leaderboard.length === 0 ? (
                 <div style={{padding: '24px 16px', textAlign: 'center'}}>
@@ -1646,7 +1732,7 @@ export default function AnimeGuesser() {
                         const place = ['first', 'second', 'third'][i];
                         const badgeNum = { first: 1, second: 2, third: 3 }[place];
                         const isCurrentPlayer = (entry.name || '').trim() === (playerName || '').trim() && (entry.score ?? 0) === total;
-                        const avatarSrc = isCurrentPlayer && avatar ? avatar : null;
+                        const avatarSrc = entry.avatar_url || (isCurrentPlayer && avatar ? avatar : null);
                         const showAvatar = avatarSrc && !podiumAvatarFailed.has(entry.id);
                         const initial = (entry.name || 'A').trim().charAt(0).toUpperCase();
                         return (

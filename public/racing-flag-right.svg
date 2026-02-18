@@ -1,0 +1,38 @@
+<svg width="140" height="52" viewBox="0 0 140 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Fade: light (near center/text)  dark (at right edge) -->
+    <linearGradient id="fadeRight" x1="0" y1="0" x2="100%" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e8e8e4" stop-opacity="0.15"/>
+      <stop offset="0.6" stop-color="#a0a09c" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#2a2a2a" stop-opacity="0.35"/>
+    </linearGradient>
+  </defs>
+  <!-- Perspective checkers: parallelograms skewed right, larger near left (center)  smaller at right edge -->
+  <!-- Row 0 -->
+  <path d="M140 0 L112 6 L112 19 L140 13 Z" fill="#000"/>
+  <path d="M112 6 L88 11 L88 24 L112 19 Z" fill="#fff"/>
+  <path d="M88 11 L68 15 L68 28 L88 24 Z" fill="#000"/>
+  <path d="M68 15 L52 18 L52 31 L68 28 Z" fill="#fff"/>
+  <path d="M52 18 L40 20 L40 33 L52 31 Z" fill="#000"/>
+  <path d="M40 20 L32 21 L32 34 L40 33 Z" fill="#fff"/>
+  <path d="M32 21 L26 22 L26 35 L32 34 Z" fill="#000"/>
+  <path d="M26 22 L22 22.5 L22 35.5 L26 35 Z" fill="#fff"/>
+  <!-- Row 1 -->
+  <path d="M140 13 L112 19 L112 32 L140 26 Z" fill="#fff"/>
+  <path d="M112 19 L88 24 L88 37 L112 32 Z" fill="#000"/>
+  <path d="M88 24 L68 28 L68 41 L88 37 Z" fill="#fff"/>
+  <path d="M68 28 L52 31 L52 44 L68 41 Z" fill="#000"/>
+  <path d="M52 31 L40 33 L40 46 L52 44 Z" fill="#fff"/>
+  <path d="M40 33 L32 34 L32 47 L40 46 Z" fill="#000"/>
+  <path d="M32 34 L26 35 L26 48 L32 47 Z" fill="#fff"/>
+  <path d="M26 35 L22 35.5 L22 48.5 L26 48 Z" fill="#000"/>
+  <!-- Row 2 -->
+  <path d="M140 26 L112 32 L112 45 L140 39 Z" fill="#000"/>
+  <path d="M112 32 L88 37 L88 50 L112 45 Z" fill="#fff"/>
+  <path d="M88 37 L68 41 L68 52 L88 50 Z" fill="#000"/>
+  <path d="M68 41 L52 44 L52 52 L68 52 Z" fill="#fff"/>
+  <path d="M52 44 L40 46 L40 52 L52 52 Z" fill="#000"/>
+  <path d="M40 46 L32 47 L32 52 L40 52 Z" fill="#fff"/>
+  <path d="M32 47 L26 48 L26 52 L32 52 Z" fill="#000"/>
+  <path d="M26 48 L22 48.5 L22 52 L26 52 Z" fill="#fff"/>
+</svg>
