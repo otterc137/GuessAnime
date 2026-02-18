@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { submitScore, getTopScores } from './supabase';
+import { FlickeringGrid } from './FlickeringGrid';
 
 // Anime-only: all entries are MAL anime IDs (TV/movie). Primary image from main anime endpoint (cover); supplemented by /pictures for variety.
 const ANIME_DB = [
@@ -674,8 +675,9 @@ html, body, #root {
   .s-t{font-size:68px;letter-spacing:0.05em}
   .start-title{font-size:64px;line-height:1.05}
   .s-sub{max-width:360px;font-size:16px}
-  .s-stats{gap:12px;margin-bottom:28px}
-  .s-stat{padding:24px 20px;border-radius:16px;flex:1;min-width:120px}
+  .s-stats{gap:12px;margin-bottom:28px;flex-wrap:wrap}
+  .s-stat{padding:24px 20px;border-radius:16px;flex:1;min-width:160px;min-height:120px;aspect-ratio:auto}
+  .s-stat--wide{width:100%;flex-basis:100%;height:120px}
   .s-stat-v{font-size:36px;font-weight:900}
   .s-stat-l{font-size:12px;letter-spacing:0.12em;opacity:0.7}
   .s-stats-line{font-size:12px}
@@ -715,8 +717,9 @@ html, body, #root {
   .btn-howto-wrap .btn-go,.btn-howto-wrap .btn-howto{width:250px;min-width:250px;max-width:250px;padding:18px 60px;font-size:16px}
   .start-buttons .btn-go,.start-buttons .btn-howto{min-width:160px;width:auto;max-width:none;padding:14px 28px;font-size:13px}
   .s-hero-right{width:100%;max-width:100%}
-  .s-stats{width:100%;gap:14px}
-  .s-stat{flex:1 1 0%;min-width:0;padding:28px 32px}
+  .s-stats{width:100%;gap:14px;flex-wrap:wrap}
+  .s-stat{flex:1 1 0%;min-width:0;padding:28px 32px;min-width:160px;min-height:120px;aspect-ratio:auto}
+  .s-stat--wide{width:100%;flex-basis:100%;height:120px}
   .s-stat-v{font-size:44px}
   .s-stat-l{font-size:12px}
   .s-rules{gap:14px}
@@ -736,6 +739,8 @@ html, body, #root {
 @media (min-width: 1440px){
   .s-hero{max-width:1200px;gap:120px}
   .s-t{font-size:56px;max-width:12ch}
+  .s-stat{min-width:220px;min-height:100px}
+  .s-stat--wide{height:100px}
   .s-stat-v{font-size:52px}
 }
 
@@ -1246,9 +1251,27 @@ export default function AnimeGuesser() {
           </div>
           <div className="s-hero-right">
             <div className="s-stats">
-              <div className="s-stat s-stat--chartreuse s-stat--r1"><span className="s-stat-v">{NUM_ROUNDS}</span><span className="s-stat-l">Rounds</span></div>
-              <div className="s-stat s-stat--black s-stat--r2"><span className="s-stat-v">{TIMER}s</span><span className="s-stat-l">Per Round</span></div>
-              <div className="s-stat s-stat--orange s-stat--r3"><span className="s-stat-v">1K</span><span className="s-stat-l">Max Pts</span></div>
+              <div className="s-stat s-stat--chartreuse s-stat--r1" style={{ position: 'relative', overflow: 'hidden' }}>
+                <FlickeringGrid squareSize={3} gridGap={5} flickerChance={0.65} color="rgb(180, 210, 40)" maxOpacity={0.3} />
+                <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                  <span className="s-stat-v">{NUM_ROUNDS}</span>
+                  <span className="s-stat-l">Rounds</span>
+                </div>
+              </div>
+              <div className="s-stat s-stat--black s-stat--r2" style={{ position: 'relative', overflow: 'hidden' }}>
+                <FlickeringGrid squareSize={3} gridGap={5} flickerChance={0.65} color="rgb(99, 99, 99)" maxOpacity={0.12} />
+                <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                  <span className="s-stat-v">{TIMER}s</span>
+                  <span className="s-stat-l">Per Round</span>
+                </div>
+              </div>
+              <div className="s-stat s-stat--orange s-stat--r3 s-stat--wide" style={{ position: 'relative', overflow: 'hidden' }}>
+                <FlickeringGrid squareSize={3} gridGap={5} flickerChance={0.65} color="rgb(255, 255, 255)" maxOpacity={0.12} />
+                <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                  <span className="s-stat-v">1K</span>
+                  <span className="s-stat-l">Max Pts</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
