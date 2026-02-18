@@ -16,7 +16,8 @@ const ANIME_DB = [
   { mal: 20, title: "Naruto", accept: ["naruto", "nrt"] },
   { mal: 21, title: "One Piece", accept: ["one piece", "onepiece", "op"] },
   { mal: 16498, title: "Attack on Titan", accept: ["attack on titan", "shingeki no kyojin", "aot", "snk"] },
-  { mal: 55701, title: "Dandadan", accept: ["dandadan", "dan da dan", "ddd"] },
+  { mal: 11061, title: "Hunter x Hunter", accept: ["hunter x hunter", "hunter hunter", "hunterxhunter", "hxh"] },
+  { mal: 14719, title: "JoJo's Bizarre Adventure", accept: ["jojo", "jojo's bizarre adventure", "jojos bizarre adventure", "jjba"] },
 ];
 
 const NUM_ROUNDS = 10;
@@ -661,8 +662,9 @@ html, body, #root {
   .title-line2{white-space:nowrap}
   .start-desc{text-align:center;font-size:16px}
   .start-buttons{flex-direction:row;justify-content:center}
-  .s-stats{flex-wrap:nowrap;flex-direction:row;gap:10px;justify-content:center}
-  .s-stat{flex:1;min-width:0;padding:20px 12px}
+  .s-hero-right{width:100%}
+  .s-stats{width:100%;flex-wrap:nowrap;flex-direction:row;gap:10px;justify-content:center}
+  .s-stat{flex:1 1 0%;min-width:0;padding:20px 12px}
   .s-stat-v{font-size:28px}
   .s-stat-l{font-size:10px;letter-spacing:0.08em}
 }
@@ -712,8 +714,9 @@ html, body, #root {
   .btn-go{padding:18px 60px;font-size:16px;transition:all 0.2s ease}
   .btn-howto-wrap .btn-go,.btn-howto-wrap .btn-howto{width:250px;min-width:250px;max-width:250px;padding:18px 60px;font-size:16px}
   .start-buttons .btn-go,.start-buttons .btn-howto{min-width:160px;width:auto;max-width:none;padding:14px 28px;font-size:13px}
-  .s-stats{gap:14px}
-  .s-stat{padding:28px 32px;min-width:160px}
+  .s-hero-right{width:100%;max-width:100%}
+  .s-stats{width:100%;gap:14px}
+  .s-stat{flex:1 1 0%;min-width:0;padding:28px 32px}
   .s-stat-v{font-size:44px}
   .s-stat-l{font-size:12px}
   .s-rules{gap:14px}
