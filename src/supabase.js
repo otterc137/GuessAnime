@@ -16,13 +16,17 @@ export async function submitScore(name, score, correct) {
   }
 }
 
+// Table columns: id, name, score, correct, created_at
+// If leaderboard is empty but data exists in Supabase: enable RLS for anon role:
+// Dashboard → leaderboard table → RLS → New policy: SELECT for anon with USING (true). Also allow INSERT for anon if needed.
 export async function getTopScores(count = 10) {
   try {
     const { data, error } = await supabase
       .from('leaderboard')
-      .select('*')
+      .select('id, name, score, correct, created_at')
       .order('score', { ascending: false })
       .limit(count);
+    console.log('Leaderboard fetch:', { data, error, rowCount: data?.length ?? 0 });
     if (error) {
       console.error('Fetch error:', error);
       return [];

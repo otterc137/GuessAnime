@@ -512,11 +512,11 @@ html, body, #root {
 .res-avatar:hover .res-avatar-icon{color:#777}
 .res-name-input{background:transparent;border:none;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:0.1em;text-align:center;color:#111;padding:0;width:100%;min-width:0;flex:1;outline:none}
 .res-name-input::placeholder{color:#999}
-.name-input-wrapper{display:flex;align-items:center;background:#FFFFFF;font-size:14px;border:1px solid rgba(153,153,153,0.05);border-image:none;border-radius:12px;padding:0 16px;max-width:220px;width:100%;margin:0 auto;transition:border-color 0.2s,box-shadow 0.2s}
+.name-input-wrapper{display:flex;align-items:center;background:#FFFFFF;font-size:14px;border:1px solid rgba(153,153,153,0.05);border-image:none;border-radius:12px;padding:0 16px;max-width:min(220px,85%);width:100%;min-width:0;margin:0 auto;transition:border-color 0.2s,box-shadow 0.2s}
 .name-input-wrapper:focus-within{border-color:#C8E600;box-shadow:0 0 0 3px rgba(200,230,0,0.25)}
 .name-edit-icon{flex-shrink:0;margin-right:8px}
 .name-input-wrapper:focus-within .name-edit-icon{stroke:#C8E600}
-.result-name-input{background:none;border:none;font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#111;text-align:center;padding:10px 0;outline:none;width:100%;caret-color:#C8E600}
+.result-name-input{background:none;border:none;font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#111;text-align:center;padding:10px 0;outline:none;width:100%;min-width:0;caret-color:#C8E600;box-sizing:border-box}
 .result-name-input::placeholder{color:#CCC;font-weight:500}
 .save-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#111;color:#C8E600;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;letter-spacing:0.1em;padding:10px 24px;border-radius:9999px;z-index:200;animation:toastIn 0.3s ease,toastOut 0.3s ease 1.7s forwards;display:inline-flex;align-items:center;gap:8px}
 .save-toast-icon{font-size:20px;line-height:1}
