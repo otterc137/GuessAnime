@@ -175,33 +175,53 @@ export function Navbar() {
           color: #111;
         }
 
-        /* Mobile */
+        /* Tablet & mobile */
         @media (max-width: 640px) {
-          .navbar-unit {
-            gap: 0;
-            justify-content: flex-start;
-            overflow-x: auto;
-            overflow-y: hidden;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 4px;
-            scrollbar-width: none;
-          }
-          .navbar-unit::-webkit-scrollbar {
-            display: none;
+          .navbar-wrapper {
+            padding: 12px 14px;
           }
           .navbar-logo-pill {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             flex-shrink: 0;
           }
           .navbar-nav-pill {
-            height: 40px;
+            height: 38px;
             padding: 0 4px;
             flex-shrink: 0;
           }
           .navbar-link {
             font-size: 10px;
-            padding: 6px 12px;
+            padding: 6px 10px;
+          }
+        }
+
+        /* Small mobile */
+        @media (max-width: 400px) {
+          .navbar-wrapper {
+            padding: 10px 10px;
+          }
+          .navbar-logo-pill {
+            width: 36px;
+            height: 36px;
+          }
+          .navbar-nav-pill {
+            height: 36px;
+            padding: 0 5px;
+          }
+          .navbar-link {
+            font-size: 9px;
+            padding: 5px 8px;
+            letter-spacing: 0.04em;
+          }
+        }
+
+        /* Very small mobile */
+        @media (max-width: 340px) {
+          .navbar-link {
+            font-size: 8px;
+            padding: 4px 6px;
+            letter-spacing: 0.02em;
           }
         }
       `}</style>

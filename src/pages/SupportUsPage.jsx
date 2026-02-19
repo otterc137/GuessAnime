@@ -7,6 +7,9 @@ export function SupportUsPage() {
   return (
     <div className="page-support">
       <div className="page-support-inner">
+        <div className="page-support-hero-wrap">
+          <img src="/support-hero.png" alt="" className="page-support-hero" />
+        </div>
         <h1 className="page-support-title">SUPPORT US</h1>
         <p className="page-support-desc">
           Having fun? Pass it along to a friend if you feel like it!
@@ -42,7 +45,7 @@ export function SupportUsPage() {
 
       <style>{`
         .page-support {
-          min-height: 100vh;
+          min-height: calc(100vh - 120px);
           padding: 24px 16px;
           background: #F5F5F0;
           font-family: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -54,6 +57,46 @@ export function SupportUsPage() {
           max-width: 420px;
           margin: 0 auto;
           text-align: center;
+        }
+        .page-support-hero-wrap {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 24px;
+          perspective: 600px;
+        }
+        .page-support-hero {
+          width: 200px;
+          height: 200px;
+          object-fit: cover;
+          border-radius: 20px;
+          border: 4px solid #fff;
+          box-shadow:
+            0 4px 16px rgba(0,0,0,0.12),
+            0 1px 4px rgba(0,0,0,0.08),
+            0 0 0 1px rgba(0,0,0,0.04);
+          transform: rotate(-2deg);
+          transition:
+            transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+            box-shadow 0.3s ease;
+          cursor: pointer;
+        }
+        .page-support-hero:hover {
+          transform: rotate(1deg) scale(1.06) translateY(-4px);
+          box-shadow:
+            0 12px 32px rgba(0,0,0,0.16),
+            0 4px 12px rgba(0,0,0,0.1),
+            0 0 0 1px rgba(0,0,0,0.04);
+        }
+        .page-support-hero:active {
+          transform: rotate(0deg) scale(0.97);
+          transition-duration: 0.1s;
+        }
+        @media (min-width: 640px) {
+          .page-support-hero {
+            width: 240px;
+            height: 240px;
+            border-radius: 24px;
+          }
         }
         .page-support-title {
           font-family: 'Gasoek', 'Vina Sans', Impact, sans-serif;
