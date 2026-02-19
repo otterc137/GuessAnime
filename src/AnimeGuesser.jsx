@@ -925,7 +925,7 @@ html, body, #root {
 .score-indicator{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:2rem;font-weight:900;color:#C8E600;text-shadow:-2px -2px 0 white,2px -2px 0 white,-2px 2px 0 white,2px 2px 0 white,0 0 8px rgba(0,0,0,0.4);animation:scoreFloat 1s ease-out forwards;white-space:nowrap}
 `;
 
-export default function AnimeGuesser() {
+export default function AnimeGuesser({ onScreenChange }) {
   const location = useLocation();
   const [screen, setScreen] = useState("start");
   const [rounds, setRounds] = useState(null);
@@ -1094,7 +1094,8 @@ export default function AnimeGuesser() {
 
   useEffect(() => {
     if (screen !== 'results') setPodiumAvatarFailed(new Set());
-  }, [screen]);
+    onScreenChange?.(screen, loading);
+  }, [screen, loading]);
 
   useEffect(() => {
     if (screen === 'results') {
