@@ -14,7 +14,20 @@ html, body, #root {
   width: 100%;
   min-height: 100vh;
   background: #F5F5F0;
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+.app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 76px; /* height of fixed navbar (16 + 44 + 16) */
 }
 
 a {

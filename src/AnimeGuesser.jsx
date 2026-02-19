@@ -318,7 +318,7 @@ html, body, #root {
   width: 100%;
   min-height: 100vh;
   background: #F5F5F0;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -345,7 +345,7 @@ html, body, #root {
 .s-loading-tip{font-family:'Bricolage Grotesque';font-size:11px;color:#999;font-style:italic;margin-top:16px}
 @media (min-width:768px){.s-loading-bar{width:280px}}
 
-.S{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;width:100%;max-width:1200px;margin-left:auto;margin-right:auto;box-sizing:border-box;position:relative;z-index:1}
+.S{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:0 24px 24px 24px;width:100%;max-width:1200px;margin-left:auto;margin-right:auto;box-sizing:border-box;position:relative;z-index:1}
 .S.S--loading{max-width:none;width:100%}
 .P{justify-content:flex-start;padding:12px 16px;align-items:stretch;height:100vh;display:flex;flex-direction:column;overflow:hidden}
 
@@ -742,6 +742,7 @@ html, body, #root {
 @media (max-width: 639px){
   .s-hero{margin-top:56px}
   .s-hero-left{align-items:center;text-align:center}
+  .s-stats{margin-top:8px;transform:translateY(-8px)}
   .s-hero-left .s-t,.s-hero-left .s-sub,.s-hero-left .start-desc{text-align:center}
   .s-hero-left .btn-howto-wrap{align-items:center}
 }
@@ -1396,14 +1397,11 @@ export default function AnimeGuesser() {
             </div>
           </div>
         )}
-        <div className="s-logo-wrap s-z">
-          <img src="/textmarklogo-aniguess.svg" alt="ANIGUESS°" style={{ height: 36, width: 'auto' }} />
-        </div>
         <div className="s-hero s-z start-content">
           <div className="s-hero-left start-left">
             <div className="logo-mark" aria-hidden />
             <h1 className="s-t start-title"><span className="shiny-text">GUESS<br />THE ANIME</span></h1>
-            <p className="start-desc">Reveal tiles from hidden anime images<br />and name the anime before time runs out.</p>
+            <p className="start-desc">Reveal tiles and guess the anime before time runs out.</p>
             <div className="btn-howto-wrap start-buttons">
               <button className="btn btn-go btn-shimmer" onClick={startGame} style={{'--spread':'90deg','--shimmer-color':'#EAFF60','--radius':'9999px','--speed':'3s','--cut':'0.05em','--bg':'rgba(220, 242, 74, 1)'}}>
                 <div className="btn-shimmer-edge">
