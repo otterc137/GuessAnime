@@ -62,12 +62,25 @@ export async function submitScore(name, score, correct, avatarDataUrl = null) {
   }
 }
 
+// Start of current ISO week (Monday 00:00 UTC)
+function getStartOfWeekISO() {
+  const d = new Date();
+  const day = d.getUTCDay();
+  const diff = (day === 0 ? -6 : 1) - day; // Monday = start
+  d.setUTCDate(d.getUTCDate() + diff);
+  d.setUTCHours(0, 0, 0, 0);
+  return d.toISOString();
+}
+
 // If leaderboard is empty but data exists: enable RLS SELECT for anon (USING true). Allow INSERT for anon.
+// Leaderboard resets weekly (only scores from current week are shown).
 export async function getTopScores(count = 10) {
   try {
+    const weekStart = getStartOfWeekISO();
     const { data, error } = await supabase
       .from('leaderboard')
       .select('id, name, score, correct, created_at, avatar_url')
+      .gte('created_at', weekStart)
       .order('score', { ascending: false })
       .limit(count);
     console.log('[Leaderboard] fetch:', { rowCount: data?.length ?? 0, error });

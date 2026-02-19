@@ -255,13 +255,16 @@ function calcScore(tilesRevealed, timeLeft, totalTime) {
   // Tile score: 1 tile = 950, each additional tile loses points
   const tileScore = Math.round(950 * Math.max(0, 1 - (tilesRevealed - 1) / (totalTiles - 1)));
 
-  // Time bonus: up to 50 points (full if answered within first 3 seconds)
+  // Time bonus: up to 50 points. 5s grace period (no decay), then 2x decay rate.
   const timeElapsed = totalTime - timeLeft;
   let timeBonus = 0;
-  if (timeElapsed <= 3) {
+  if (timeElapsed <= 5) {
     timeBonus = 50;
   } else {
-    timeBonus = Math.round(50 * Math.max(0, timeLeft / (totalTime - 3)));
+    // After 5s: 2x decay (original rate 50/(totalTime-3) per second → 2*50/57 per second)
+    const decayRate = 2 * 50 / (totalTime - 3);
+    const decaySeconds = timeElapsed - 5;
+    timeBonus = Math.round(Math.max(0, 50 - decaySeconds * decayRate));
   }
 
   const total = tileScore + timeBonus;
@@ -282,9 +285,9 @@ const RESULT_TITLES = [
   /* 9000+ */ ["Senpai noticed you!", "Main character energy!", "Omedetou! SSS rank.", "Your power level... it's over 9000!", "Nakama would be proud.", "Certified otaku. No cap.", "Kami-sama tier.", "That was very kawaii of you."],
   /* 8000–9000 */ ["Sugoi! Solid arc.", "Your power level is acceptable.", "Worthy of a second season.", "Ara ara, not bad~", "The council of weebs approves.", "Strong protagonist energy.", "Yare yare, that was clean."],
   /* 6000–8000 */ ["A filler arc, but we still love you.", "The training arc continues.", "Plot armor: partial. Keep grinding.", "Getting there, nakama!", "Honorable mention from the guild.", "Mid diff. Respectable.", "Your chūnibyō phase is paying off."],
-  /* 4000–6000 */ ["Even isekai protagonists had a rough start.", "The power of friendship didn't kick in yet.", "Plot armor was on break.", "Nani?! Room to grow.", "Character development arc: loading...", "We've seen worse. Barely.", "Your waifu believes in you."],
-  /* 2000–4000 */ ["At least you tried. Ganbare!", "Maybe stick to the OP/ED for now.", "Your waifu would still be proud. Probably.", "Skill issue. (We say with love.)", "The tutorial was optional, we guess.", "It's the journey, right? Right?!", "Next run: protagonist moment."],
-  /* 0–2000 */ ["The tutorial was that way. →", "Even NPCs had a better day. Maybe.", "Certified moment. We believe in glow-ups.", "It's the thought that counts?", "We're not crying. You're crying.", "Your power level is... evolving. Slowly.", "Gacha luck will balance out. Copium."],
+  /* 4000–6000 */ ["Even isekai protagonists had a rough start.", "The power of friendship didn't kick in yet.", "Plot armor was on break.", "Nani?! Room to grow.", "Character development arc: loading...", "We've seen worse. Barely.", "Nakama believes in you."],
+  /* 2000–4000 */ ["At least you tried. Ganbare!", "OP/ED only. We won't judge. Much.", "Nakama would still be proud. Probably.", "Main character energy: loading...", "The tutorial was optional. Allegedly.", "It's the journey, right? Right?!", "Next run: protagonist moment."],
+  /* 0–2000 */ ["The tutorial was that way. →", "Even background characters did better. Oof.", "Certified filler arc. No one remembers filler.", "It's the thought that counts?", "We're not crying. You're crying.", "Your power level is... evolving. Slowly.", "Gacha luck will balance out. Copium."],
 ];
 function getResultTitle(total) {
   const tier = total >= 9000 ? 0 : total >= 8000 ? 1 : total >= 6000 ? 2 : total >= 4000 ? 3 : total >= 2000 ? 4 : 5;
@@ -293,16 +296,19 @@ function getResultTitle(total) {
 }
 
 const LEADERBOARD_ENCOURAGEMENT = [
-  "Daijoubu! Next round!",
-  "The protagonist always loses the first fight. Next time!",
-  "Power of friendship didn't kick in yet. Try again!",
-  "Even isekai protagonists get reincarnated. See you next run!",
-  "Genki dashite! You'll level up next run.",
-  "Not bad for a side character. Aim for main cast next!",
-  "The training arc continues. See you next round!",
-  "Plot armor was on cooldown. It'll be back.",
-  "Your waifu believes in you. Go again!",
-  "Nani?! Room to grow. Next round!",
+  "Plot armor was buffering. Try again!",
+  "Power-up loading... (insert coin)",
+  "Protagonist lost round 1. Classic.",
+  "Isekai rules: respawn, don't reset.",
+  "Training arc: still in session.",
+  "Side character energy. Main character soon?",
+  "Nani?! Go again, you.",
+  "Skill issue. (We say with love.)",
+  "Shounen law: defeat = free power-up.",
+  "Another round won't hurt. Probably.",
+  "The council of weebs awaits improvement.",
+  "Filler arc. No one remembers filler.",
+  "Even NPCs had a better run. Ouch.",
 ];
 
 const CSS = `
@@ -540,7 +546,7 @@ html, body, #root {
 .res-rank-tag{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:5px 12px;border-radius:9999px;color:#3a3a38;background:linear-gradient(180deg,#e8e8e4 0%,#d4d4d0 50%,#c4c4c0 100%);border:1px solid rgba(0,0,0,0.06);box-shadow:inset 0 1px 2px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.04)}
 .res-rank-tag-icon{flex-shrink:0;vertical-align:middle}
 .res-encouragement{display:inline-block;margin-top:10px;padding:6px 14px;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.02em;color:#5a5a5a;text-align:center;line-height:1.35;border-radius:9999px;background:linear-gradient(180deg,#e8e8e4 0%,#d4d4d0 50%,#c4c4c0 100%);border:1px solid rgba(0,0,0,0.06);box-shadow:inset 0 1px 2px rgba(255,255,255,0.6),0 1px 2px rgba(0,0,0,0.04)}
-.res-grid{display:grid;grid-template-columns:repeat(5,64px);gap:10px;justify-content:center;margin:20px auto;perspective:400px;position:relative}
+.res-grid{display:grid;grid-template-columns:repeat(5,64px);gap:10px;justify-content:center;margin:20px auto 8px;perspective:400px;position:relative}
 .res-grid::after{content:'';position:absolute;inset:-20px;background:radial-gradient(ellipse at center,rgba(222,255,10,0.08),transparent 70%);pointer-events:none;z-index:-1}
 .res-block{width:64px;height:64px;border-radius:10px;display:flex;align-items:center;justify-content:center;transform-style:preserve-3d;transition:all 0.2s ease}
 .res-block>.res-block-icon{display:flex;align-items:center;justify-content:center;width:100%;height:100%;line-height:1;text-align:center}
@@ -591,32 +597,36 @@ html, body, #root {
 .lb-podium-score-bar::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 0%,transparent 35%,rgba(255,255,255,0.4) 50%,transparent 65%,transparent 100%);background-size:300% 100%;animation:lbShimmer 5s ease-in-out infinite;border-radius:inherit}
 @keyframes lbShimmer{0%,100%{background-position:150% 0}50%{background-position:-150% 0}}
 .lb-podium-item.first{background-clip:unset;-webkit-background-clip:unset;color:rgba(17,17,17,1)}
-.lb-podium-item.first .lb-podium-score-bar{height:148px;background:linear-gradient(180deg,#FBF6E4 0%,#F6EDD0 22%,#EFE4B8 45%,#E6D898 68%,#DFCC78 85%,rgba(223,204,120,0.45) 93%,rgba(223,204,120,0) 100%) !important}
-.lb-podium-item.second .lb-podium-score-bar{height:128px;background:linear-gradient(180deg,#E8E8E8 0%,#CCCCCC 65%,rgba(204,204,204,0) 100%)}
+.lb-podium-item.first .lb-podium-score-bar{height:156px;background:linear-gradient(180deg,#FBF6E4 0%,#F6EDD0 22%,#EFE4B8 45%,#E6D898 68%,#DFCC78 85%,rgba(223,204,120,0.45) 93%,rgba(223,204,120,0) 100%) !important}
+.lb-podium-item.second .lb-podium-score-bar{height:136px;background:linear-gradient(180deg,#E8E8E8 0%,#CCCCCC 65%,rgba(204,204,204,0) 100%)}
 .lb-podium-item.second .lb-podium-score-bar::after{animation-delay:0.8s}
-.lb-podium-item.third .lb-podium-score-bar{height:112px;background:linear-gradient(180deg,rgba(245,208,169,1) 0%,rgba(232,184,120,0) 100%,rgba(232,184,120,1) 60%)}
+.lb-podium-item.third .lb-podium-score-bar{height:120px;background:linear-gradient(180deg,rgba(245,208,169,1) 0%,rgba(232,184,120,0) 100%,rgba(232,184,120,1) 60%)}
 .lb-podium-item.third .lb-podium-score-bar::after{animation-delay:1.6s}
 .lb-podium-score-bar-top{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:4px}
 .lb-podium-rank-badge{display:inline-block;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.15em;line-height:1;padding:2px 6px;border-radius:9999px;background:rgba(0,0,0,0.2);color:#fff;border:1px solid rgba(0,0,0,0.25);text-shadow:0 1px 1px rgba(0,0,0,0.2)}
 .lb-podium-item.first .lb-podium-rank-badge{background:rgba(139,105,20,0.5);color:#fff;border:1px solid rgba(101,76,15,0.6)}
 .lb-podium-item.second .lb-podium-rank-badge{background:rgba(60,60,60,0.45);border-color:rgba(40,40,40,0.5)}
 .lb-podium-item.third .lb-podium-rank-badge{background:rgba(80,55,35,0.5);border-color:rgba(60,42,25,0.55)}
-.lb-podium-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.25);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cabinet Grotesk',sans-serif;font-size:11px;font-weight:800;color:rgba(0,0,0,0.6)}
+.lb-podium-avatar{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.25);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cabinet Grotesk',sans-serif;font-size:12px;font-weight:800;color:rgba(0,0,0,0.6)}
 .lb-podium-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .lb-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .lb-podium-name{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;font-weight:700;color:#111;text-transform:uppercase;max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
-.lb-podium-score{position:relative;z-index:1;font-family:'Cabinet Grotesk',sans-serif;font-size:16px;line-height:24px;font-weight:800;color:#111;background:rgba(255,255,255,0.25);padding:2px 8px;border-radius:8px}
-.lb-list{padding:0 12px 16px}
-.lb-row{position:relative;display:flex;align-items:center;padding:10px 12px;border-radius:10px;margin-bottom:4px;transition:background 0.2s}
+.lb-podium-score{position:relative;z-index:1;font-family:'Cabinet Grotesk',sans-serif;font-size:16px;line-height:24px;font-weight:800;color:#111;background:rgba(255,255,255,0.25);padding:0 8px;border-radius:8px}
+.lb-list{padding:0 12px 12px}
+.lb-remark{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px 16px;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:#888;line-height:1.4}
+.lb-remark svg{flex-shrink:0;opacity:0.7}
+.lb-row{position:relative;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:4px;transition:background 0.2s}
 .lb-row:not(:last-child)::after{content:'';position:absolute;bottom:0;left:12px;right:12px;height:1px;background:rgba(0,0,0,0.06)}
 .lb-row.is-me{background:rgba(200,230,0,0.12)}
 .lb-rank{width:32px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#BBB;flex-shrink:0}
+.lb-row-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.25);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Cabinet Grotesk',sans-serif;font-size:11px;font-weight:800;color:rgba(0,0,0,0.6)}
+.lb-row-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .lb-name{flex:1;font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:600;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lb-row-score{font-family:'Bricolage Grotesque';font-size:12px;font-weight:700;color:#666;flex-shrink:0}
 .results-footer{position:sticky;bottom:0;left:0;width:100%;padding:20px 0 24px;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:10;background:#F5F5F0;flex-shrink:0}
 .results-footer::before{content:'';position:absolute;bottom:100%;left:0;right:0;height:60px;background:linear-gradient(to bottom,rgba(245,245,240,0),rgba(245,245,240,1));pointer-events:none}
 .res-actions{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;max-width:800px;margin:0 auto;flex-wrap:wrap}
-.res-actions .btn-share,.res-actions .btn-play-again-outline{width:200px;min-width:200px;box-sizing:border-box}
+.res-actions .btn-share,.res-actions .btn-play-again-outline{width:200px;min-width:200px;min-height:46px;box-sizing:border-box}
 .btn-share{background:#DEFF0A;color:#111;border:none;border-radius:9999px;padding:14px 40px;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform 0.2s ease,box-shadow 0.2s ease,background 0.2s ease}
 .btn-share:hover{background:#d4f000;transform:scale(1.03);box-shadow:0 4px 16px rgba(222,255,10,0.4)}
 .btn-share:active{transform:scale(0.98)}
@@ -660,42 +670,43 @@ html, body, #root {
   .play-wrap{padding:8px;gap:6px}
   .B{aspect-ratio:4/3 !important}
   .res-wrap{text-align:center;align-items:center}
-  .res-title{text-align:center;padding:0 20px}
-  .res-grid{grid-template-columns:repeat(5,56px);gap:6px}
-  .res-block{width:56px;height:56px}
+  .res-title{text-align:center;padding:0 20px;line-height:1.3}
+  .res-grid{grid-template-columns:repeat(5,52px);gap:5px}
+  .res-block{width:52px;height:52px}
   .leaderboard{max-width:100%}
   .lb-header-flag{width:40%}
   .lb-podium{padding:8px 8px 16px}
   .lb-podium-row{gap:12px}
   .lb-podium-score-bar{width:80px;padding:8px 6px 10px}
-  .lb-podium-item.first .lb-podium-score-bar{height:120px}
-  .lb-podium-item.second .lb-podium-score-bar{height:104px}
-  .lb-podium-item.third .lb-podium-score-bar{height:92px}
+  .lb-podium-item.first .lb-podium-score-bar{height:128px}
+  .lb-podium-item.second .lb-podium-score-bar{height:112px}
+  .lb-podium-item.third .lb-podium-score-bar{height:100px}
   .lb-podium-name{max-width:80px;font-size:11px}
-  .lb-podium-avatar{width:28px;height:28px;font-size:10px}
+  .lb-podium-avatar{width:38px;height:38px;font-size:10px}
   .lb-podium-rank-badge{font-size:10px;padding:2px 5px}
-  .lb-podium-score{font-size:14px;padding:2px 6px}
+  .lb-podium-score{font-size:14px;padding:0 6px}
   .lb-podium-item-crown svg{width:28px;height:28px}
 }
 @media (min-width: 394px) and (max-width: 479px){
   .lb-podium{padding:8px 8px 14px}
   .lb-podium-row{gap:12px}
   .lb-podium-score-bar{width:84px;padding:8px 6px 10px}
-  .lb-podium-item.first .lb-podium-score-bar{height:126px}
-  .lb-podium-item.second .lb-podium-score-bar{height:108px}
-  .lb-podium-item.third .lb-podium-score-bar{height:96px}
+  .lb-podium-item.first .lb-podium-score-bar{height:134px}
+  .lb-podium-item.second .lb-podium-score-bar{height:116px}
+  .lb-podium-item.third .lb-podium-score-bar{height:104px}
   .lb-podium-name{max-width:84px}
 }
 @media (min-width: 480px) and (max-width: 767px){
   .lb-podium{padding:8px 10px 16px}
   .lb-podium-row{gap:14px}
   .lb-podium-score-bar{width:88px;padding:9px 7px 11px}
-  .lb-podium-item.first .lb-podium-score-bar{height:132px}
-  .lb-podium-item.second .lb-podium-score-bar{height:114px}
-  .lb-podium-item.third .lb-podium-score-bar{height:100px}
+  .lb-podium-item.first .lb-podium-score-bar{height:140px}
+  .lb-podium-item.second .lb-podium-score-bar{height:122px}
+  .lb-podium-item.third .lb-podium-score-bar{height:108px}
   .lb-podium-name{max-width:88px;font-size:11px}
 }
 @media (max-width: 480px){
+  .res-actions .btn-share,.res-actions .btn-play-again-outline{width:155px;min-width:155px;min-height:44px;padding:12px 24px;font-size:12px}
   .lb-header-flag{width:28%}
   .lb-header-text{padding:0 20px}
   .start-buttons{flex-direction:column;width:100%}
@@ -708,20 +719,22 @@ html, body, #root {
   .B{aspect-ratio:1/1 !important}
 }
 @media (max-width: 400px){
+  .res-title{font-size:18px}
+  .res-actions .btn-share,.res-actions .btn-play-again-outline{width:140px;min-width:140px;min-height:42px;padding:10px 20px;font-size:11px}
   .lb-header-flag{width:24%}
   .lb-header-text{padding:0 16px}
-  .res-grid{grid-template-columns:repeat(5,48px);gap:5px}
-  .res-block{width:48px;height:48px}
+  .res-grid{grid-template-columns:repeat(5,44px);gap:4px}
+  .res-block{width:44px;height:44px}
   .lb-podium{padding:8px 4px 14px}
   .lb-podium-row{gap:10px}
   .lb-podium-score-bar{width:70px;padding:6px 4px 8px}
-  .lb-podium-item.first .lb-podium-score-bar{height:100px}
-  .lb-podium-item.second .lb-podium-score-bar{height:88px}
-  .lb-podium-item.third .lb-podium-score-bar{height:76px}
+  .lb-podium-item.first .lb-podium-score-bar{height:108px}
+  .lb-podium-item.second .lb-podium-score-bar{height:96px}
+  .lb-podium-item.third .lb-podium-score-bar{height:84px}
   .lb-podium-name{max-width:70px;font-size:10px}
-  .lb-podium-avatar{width:24px;height:24px;font-size:9px}
+  .lb-podium-avatar{width:38px;height:38px;font-size:9px}
   .lb-podium-rank-badge{font-size:9px;padding:1px 4px}
-  .lb-podium-score{font-size:12px;padding:1px 4px}
+  .lb-podium-score{font-size:12px;padding:0 4px}
   .lb-podium-item-crown svg{width:24px;height:24px}
 }
 
@@ -783,13 +796,13 @@ html, body, #root {
   .lb-podium{padding:10px 24px 28px}
   .lb-podium-row{gap:24px}
   .lb-podium-score-bar{width:120px;padding:12px 10px 8px}
-  .lb-podium-item.first .lb-podium-score-bar{height:172px}
-  .lb-podium-item.second .lb-podium-score-bar{height:148px}
-  .lb-podium-item.third .lb-podium-score-bar{height:128px}
+  .lb-podium-item.first .lb-podium-score-bar{height:180px}
+  .lb-podium-item.second .lb-podium-score-bar{height:156px}
+  .lb-podium-item.third .lb-podium-score-bar{height:136px}
   .lb-podium-name{max-width:120px;font-size:13px}
-  .lb-podium-avatar{width:38px;height:38px;font-size:12px}
+  .lb-podium-avatar{width:44px;height:44px;font-size:12px}
   .lb-podium-rank-badge{font-size:11px;padding:3px 8px}
-  .lb-podium-score{font-size:18px;padding:3px 10px}
+  .lb-podium-score{font-size:18px;padding:1px 10px}
   .lb-podium-item-crown svg{width:38px;height:38px}
 }
 @media (min-width: 1024px){
@@ -806,13 +819,13 @@ html, body, #root {
   .lb-podium{padding:12px 28px 32px}
   .lb-podium-row{gap:28px}
   .lb-podium-score-bar{width:132px;padding:14px 12px 16px}
-  .lb-podium-item.first .lb-podium-score-bar{height:188px}
-  .lb-podium-item.second .lb-podium-score-bar{height:162px}
-  .lb-podium-item.third .lb-podium-score-bar{height:140px}
+  .lb-podium-item.first .lb-podium-score-bar{height:196px}
+  .lb-podium-item.second .lb-podium-score-bar{height:170px}
+  .lb-podium-item.third .lb-podium-score-bar{height:148px}
   .lb-podium-name{max-width:132px;font-size:14px}
-  .lb-podium-avatar{width:42px;height:42px;font-size:13px}
+  .lb-podium-avatar{width:44px;height:44px;font-size:13px}
   .lb-podium-rank-badge{font-size:12px;padding:3px 8px}
-  .lb-podium-score{font-size:19px;padding:4px 12px}
+  .lb-podium-score{font-size:19px;padding:2px 12px}
   .lb-podium-item-crown svg{width:42px;height:42px}
   .lb-row-score{font-size:14px}
   .res-actions{max-width:900px}
@@ -868,6 +881,8 @@ html, body, #root {
 @keyframes tileReveal{to{opacity:0;transform:scale(0.5) rotateX(90deg)}}
 @keyframes tileFlip{0%{transform:scale(1) rotateY(0);opacity:1}100%{transform:scale(0.7) rotateY(90deg);opacity:0}}
 @keyframes ripple{0%{transform:scale(0);opacity:0.6}100%{transform:scale(2);opacity:0}}
+@keyframes penaltyFloat{0%{opacity:1;transform:translateY(0) scale(1.2)}100%{opacity:0;transform:translateY(-60px) scale(1)}}
+@keyframes scoreFloat{0%{opacity:1;transform:translateY(0) scale(1.2)}100%{opacity:0;transform:translateY(-60px) scale(1)}}
 @keyframes slideOutLeft{to{transform:translateX(-30px);opacity:0}}
 @keyframes slideInRight{from{transform:translateX(30px);opacity:0}to{transform:translateX(0);opacity:1}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
@@ -902,6 +917,9 @@ html, body, #root {
 .inp-x{position:absolute;right:0;top:50%;transform:translateY(-50%);font-size:18px;font-weight:700;color:#FF4444;animation:inpXFade 0.4s ease-out;pointer-events:none}
 @keyframes inpXFade{0%{opacity:0;transform:translateY(-50%) scale(0.5)}50%{opacity:1;transform:translateY(-50%) scale(1.2)}100%{opacity:0;transform:translateY(-50%) scale(1)}}
 .tile-ripple{position:absolute;inset:0;margin:auto;width:20px;height:20px;border-radius:50%;background:rgba(222,255,10,0.4);animation:ripple 0.35s ease-out forwards;pointer-events:none}
+.penalty-indicator-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:15}
+.penalty-indicator{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:2rem;font-weight:900;color:#F87171;text-shadow:-2px -2px 0 white,2px -2px 0 white,-2px 2px 0 white,2px 2px 0 white,0 0 8px rgba(0,0,0,0.4);animation:penaltyFloat 1s ease-out forwards;white-space:nowrap}
+.score-indicator{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:2rem;font-weight:900;color:#C8E600;text-shadow:-2px -2px 0 white,2px -2px 0 white,-2px 2px 0 white,2px 2px 0 white,0 0 8px rgba(0,0,0,0.4);animation:scoreFloat 1s ease-out forwards;white-space:nowrap}
 `;
 
 export default function AnimeGuesser() {
@@ -954,11 +972,15 @@ export default function AnimeGuesser() {
   const [streakBounce, setStreakBounce] = useState(false);
   const lastStreakRef = useRef(0);
   const typewriterRef = useRef(null);
+  const [roundMaxCap, setRoundMaxCap] = useState(1000);
+  const [penaltyIds, setPenaltyIds] = useState([]);
+  const penaltyIdRef = useRef(0);
 
   const initRound = useCallback(() => {
     setRevealed(new Set()); setGuess(""); setTime(TIMER);
+    setRoundMaxCap(1000);
     setTimerStarted(false);
-    setResult(null); setRScore(0); setWrongMsg(""); setFloats([]);
+    setResult(null); setRScore(0); setWrongMsg(""); setFloats([]); setPenaltyIds([]);
     setShowConfetti(false); setConfettiPieces([]); setIsShaking(false); setBoardPulse(false);
     setDisplayScore(0); setInputShake(false); setInputBorderFlash(false); setWrongToastSlide(false);
     setInpXShow(false); setFlippingTiles(new Set()); setRippleTile(null); setCascadeReveal(false);
@@ -981,6 +1003,7 @@ export default function AnimeGuesser() {
   const [leaderboard, setLeaderboard] = useState(DEFAULT_LEADERBOARD);
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
   const [podiumAvatarFailed, setPodiumAvatarFailed] = useState(new Set());
+  const [listAvatarFailed, setListAvatarFailed] = useState(new Set());
 
   const startGame = async () => {
     const replay = screen === "results" || screen === "playing";
@@ -1032,7 +1055,7 @@ export default function AnimeGuesser() {
     const savedAvatar = localStorage.getItem('aniguess-avatar');
     if (savedAvatar) setAvatar(savedAvatar);
   }, []);
-  const LOADING_TIPS = ["FEWER TILES = MORE POINTS", "SPEED RUN MODE: ON", "YOU KNOW YOUR ANIME", "REVEAL LESS, SCORE MORE", "IT'S IN THE EYES (AND HAIR)"];
+  const LOADING_TIPS = ["FEWER TILES = MORE POINTS", "SPEED RUN MODE: ON", "YOU KNOW YOUR ANIME", "REVEAL LESS, SCORE MORE", "IT'S IN THE EYES (AND HAIR)", "WRONG GUESS = -25 PTS. NO REFUNDS."];
   useEffect(() => {
     if (!loading) return;
     if (prog === 0) {
@@ -1215,10 +1238,10 @@ export default function AnimeGuesser() {
     lastStreakRef.current = streak;
   }, [streak]);
 
-  const addFloat = (text, color) => {
+  const addFloat = (text) => {
     const id = ++fid.current;
-    setFloats(p => [...p, { id, text, color, x: 30 + Math.random() * 40 }]);
-    setTimeout(() => setFloats(p => p.filter(f => f.id !== id)), 1200);
+    setFloats(p => [...p, { id, text }]);
+    setTimeout(() => setFloats(p => p.filter(f => f.id !== id)), 1100);
   };
 
   const endRound = (correct, sc, gaveUp = false) => {
@@ -1229,7 +1252,7 @@ export default function AnimeGuesser() {
     const r = { correct, score: sc, answer: rounds[round].hint, gaveUp };
     setResult(r); setRScore(sc);
     if (correct) {
-      setTotal(p => p + sc); setStreak(p => p + 1); addFloat(`+${sc}`, "#111");
+      setTotal(p => p + sc); setStreak(p => p + 1); addFloat(`+${sc} pts`);
       setIsShaking(true); setBoardPulse(true); setDisplayScore(0); setScorePulse(true);
       setTimeout(() => setIsShaking(false), 300);
       setTimeout(() => setBoardPulse(false), 500);
@@ -1252,8 +1275,15 @@ export default function AnimeGuesser() {
     e.preventDefault();
     if (!guess.trim() || result || !rounds) return;
     const n = guess.trim().toLowerCase();
-    if (rounds[round].accept.some(a => n === a)) endRound(true, calcScore(revealed.size, time, TIMER));
-    else {
+    if (rounds[round].accept.some(a => n === a)) {
+      const rawScore = calcScore(revealed.size, time, TIMER);
+      const cappedScore = Math.max(0, Math.min(rawScore, roundMaxCap));
+      endRound(true, cappedScore);
+    } else {
+      setRoundMaxCap(prev => Math.max(0, prev - 25));
+      const pid = ++penaltyIdRef.current;
+      setPenaltyIds(prev => [...prev, pid]);
+      setTimeout(() => setPenaltyIds(prev => prev.filter(id => id !== pid)), 1100);
       setWrongMsg(WRONG[Math.floor(Math.random() * WRONG.length)](guess.trim()));
       setInputShake(true); setInputBorderFlash(true); setWrongToastSlide(true); setInpXShow(true);
       setTimeout(() => setInputShake(false), 400);
@@ -1280,7 +1310,8 @@ export default function AnimeGuesser() {
   };
 
   const pct = (time / TIMER) * 100;
-  const maxPts = rounds ? calcScore(revealed.size, time, TIMER) : 1000;
+  const rawMaxPts = rounds ? calcScore(revealed.size, time, TIMER) : 1000;
+  const maxPts = Math.min(rawMaxPts, roundMaxCap);
 
   // ===== START / LOADING =====
   if (screen === "start") return (
@@ -1614,15 +1645,14 @@ export default function AnimeGuesser() {
             </div>
             <h1 className="res-title">{getResultTitle(total)}</h1>
             <div className="res-score">{total.toLocaleString()}</div>
-            {leaderboard.length > 0 ? (() => {
-              const rank = 1 + leaderboard.filter(e => (e.score ?? 0) > total).length;
-              const onLeaderboard = rank <= Math.min(10, leaderboard.length);
+            {(() => {
+              const betterScores = leaderboard.filter(e => (e.score ?? 0) > total).length;
+              const rank = 1 + betterScores;
+              const onLeaderboard = total > 0 && rank <= 10;
               return onLeaderboard
                 ? <span className="res-rank-tag"><svg className="res-rank-tag-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M12 19V5M5 12l7-7 7 7"/></svg>Rank #{rank}</span>
                 : <span className="res-encouragement">{LEADERBOARD_ENCOURAGEMENT[total % LEADERBOARD_ENCOURAGEMENT.length]}</span>;
-            })() : (
-              <span className="res-encouragement">{LEADERBOARD_ENCOURAGEMENT[total % LEADERBOARD_ENCOURAGEMENT.length]}</span>
-            )}
+            })()}
             <div className="res-grid">
               {displayResults.map((r, i) => (
                 <div
@@ -1657,6 +1687,7 @@ export default function AnimeGuesser() {
                   </p>
                 </div>
               ) : leaderboard.length < 3 ? (
+                <>
                 <div className="lb-list">
                   {leaderboard.map((entry, i) => (
                     <div className={`lb-row ${entry.isMe ? 'is-me' : ''}`} key={entry.id}>
@@ -1709,6 +1740,11 @@ export default function AnimeGuesser() {
                     </div>
                   ))}
                 </div>
+                <div className="lb-remark" role="note">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                  <span>Resets weekly. New week, new throne.</span>
+                </div>
+                </>
               ) : (
                 <>
                   <div className="lb-podium">
@@ -1783,13 +1819,25 @@ export default function AnimeGuesser() {
                     </div>
                   </div>
                   <div className="lb-list">
-                    {leaderboard.slice(3).map((entry, i) => (
+                    {leaderboard.slice(3).map((entry, i) => {
+                      const isCurrentPlayer = (entry.name || '').trim() === (playerName || '').trim() && (entry.score ?? 0) === total;
+                      const avatarSrc = entry.avatar_url || (isCurrentPlayer && avatar ? avatar : null);
+                      const showAvatar = avatarSrc && !listAvatarFailed.has(entry.id);
+                      const initial = (entry.name || 'A').trim().charAt(0).toUpperCase();
+                      return (
                       <div className={`lb-row ${entry.isMe ? 'is-me' : ''}`} key={entry.id}>
                         <span className="lb-rank">#{i + 4}</span>
+                        <div className="lb-row-avatar">
+                          {showAvatar ? <img src={avatarSrc} alt="" onError={() => setListAvatarFailed(s => new Set([...s, entry.id]))} /> : <span aria-hidden>{initial}</span>}
+                        </div>
                         <span className="lb-name">{entry.name || 'Anonymous'}</span>
                         <span className="lb-row-score">{(entry.score ?? 0).toLocaleString()}</span>
                       </div>
-                    ))}
+                    );})}
+                  </div>
+                  <div className="lb-remark" role="note">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                    <span>Resets weekly. New week, new throne.</span>
                   </div>
                 </>
               )}
@@ -1897,14 +1945,15 @@ export default function AnimeGuesser() {
                   </div>
                 ))}
               </div>
+              {penaltyIds.map(id=>(
+                <div key={id} className="penalty-indicator-wrap" aria-hidden>
+                  <span className="penalty-indicator">-25 pts</span>
+                </div>
+              ))}
               {floats.map(f=>(
-                <div key={f.id} className="float-score-text" style={{
-                  position:"absolute",left:`${f.x}%`,top:"40%",zIndex:10,
-                  pointerEvents:"none",
-                  color:"#DEFF0A",
-                  textShadow:"0 2px 8px rgba(0,0,0,0.7), 0 0 16px rgba(222,255,10,0.3)",
-                  WebkitTextStroke:"1px #111"
-                }}>{f.text}</div>
+                <div key={f.id} className="penalty-indicator-wrap" aria-hidden>
+                  <span className="score-indicator">{f.text}</span>
+                </div>
               ))}
             </div>
             </div>
