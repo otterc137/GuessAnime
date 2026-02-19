@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { submitScore, getTopScores } from './supabase';
 import { FlickeringGrid } from './FlickeringGrid';
 
@@ -925,6 +926,7 @@ html, body, #root {
 `;
 
 export default function AnimeGuesser() {
+  const location = useLocation();
   const [screen, setScreen] = useState("start");
   const [rounds, setRounds] = useState(null);
   const [round, setRound] = useState(0);
@@ -1057,6 +1059,13 @@ export default function AnimeGuesser() {
     const savedAvatar = localStorage.getItem('aniguess-avatar');
     if (savedAvatar) setAvatar(savedAvatar);
   }, []);
+
+  useEffect(() => {
+    if (location.state?.autoStart && screen === "start") {
+      startGame();
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
   const LOADING_TIPS = ["FEWER TILES = MORE POINTS", "SPEED RUN MODE: ON", "YOU KNOW YOUR ANIME", "REVEAL LESS, SCORE MORE", "IT'S IN THE EYES (AND HAIR)", "WRONG GUESS = -25 PTS. NO REFUNDS."];
   useEffect(() => {
     if (!loading) return;

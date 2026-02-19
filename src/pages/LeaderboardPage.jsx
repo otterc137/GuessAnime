@@ -51,7 +51,7 @@ export function LeaderboardPage() {
           </div>
         )}
 
-        <Link to="/" className="btn btn-go btn-shimmer page-lb-cta" style={{ '--bg': 'rgba(220, 242, 74, 1)' }}>
+        <Link to="/" state={{ autoStart: true }} className="btn btn-go btn-shimmer page-lb-cta" style={{ '--bg': 'rgba(220, 242, 74, 1)' }}>
           <div className="btn-shimmer-edge">
             <div className="btn-shimmer-spark" />
           </div>
