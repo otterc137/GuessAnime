@@ -571,10 +571,10 @@ html, body, #root {
 .btn-view-rounds:hover{color:#111}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .lb-title{font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
-.round-row{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,0.06)}
+.round-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,0,0,0.06)}
 .round-label{font-size:12px;color:#999;font-weight:700;width:36px;font-family:'Space Mono',monospace}
 .round-title{font-size:14px;color:#111;font-weight:600;flex:1;margin-left:8px;font-family:'Cabinet Grotesk',sans-serif}
-.round-score-pill{padding:4px 12px;border-radius:9999px;font-size:12px;font-weight:900;font-family:'Space Mono',monospace}
+.round-score-pill{padding:4px 12px;border-radius:9999px;font-size:12px;font-weight:900;font-family:'Bricolage Grotesque',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 .round-score-pill.correct{background:#DEFF0A;color:#111}
 .round-score-pill.miss{background:#111;color:#F5F5F0}
 .leaderboard{width:100%;max-width:560px;margin:12px auto 0;background:#FFFFFF;border-radius:20px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 4px 24px rgba(0,0,0,0.06),0 1px 4px rgba(0,0,0,0.04),inset 0 2px 8px rgba(0,0,0,0.04),inset 0 -2px 6px rgba(0,0,0,0.02);overflow:hidden;padding:0;flex-shrink:0}
@@ -671,6 +671,7 @@ html, body, #root {
   .B{aspect-ratio:4/3 !important}
   .res-wrap{text-align:center;align-items:center}
   .res-title{text-align:center;padding:0 20px;line-height:1.3}
+  .round-score-pill{font-size:10px}
   .res-grid{grid-template-columns:repeat(5,52px);gap:5px}
   .res-block{width:52px;height:52px}
   .leaderboard{max-width:100%}
@@ -1847,7 +1848,7 @@ export default function AnimeGuesser() {
             <div className="modal-overlay" onClick={() => setShowRoundsModal(false)}>
               <div className="modal-card" onClick={e => e.stopPropagation()}>
                 <button type="button" className="modal-close" onClick={() => setShowRoundsModal(false)}>✕</button>
-                <h3 className="lb-title" style={{fontSize:24, marginBottom:16}}>ROUND BREAKDOWN</h3>
+                <h3 className="lb-title" style={{fontSize:24, marginBottom:16, paddingTop:20}}>ROUND BREAKDOWN</h3>
                 {displayResults.map((r, i) => (
                   <div className="round-row" key={i}>
                     <span className="round-label">R{i + 1}</span>
