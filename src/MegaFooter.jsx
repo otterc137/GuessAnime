@@ -131,7 +131,7 @@ export function MegaFooter() {
       );
     };
     init();
-    const id = setInterval(update, 100);
+    const id = setInterval(update, 200);
     return () => clearInterval(id);
   }, []);
 
@@ -142,7 +142,7 @@ export function MegaFooter() {
   }, []);
 
   const logoRef = useRef(null);
-  const isLogoInView = useInView(logoRef, { once: true });
+  const isLogoInView = useInView(logoRef, { once: false, amount: 0.3 });
 
   return (
     <footer className="mega-footer">
@@ -153,9 +153,19 @@ export function MegaFooter() {
           ))}
           <motion.span
             className="mega-footer-logo-wrap"
-            initial={{ opacity: 0, clipPath: 'inset(0 100% 0 0)' }}
-            animate={isLogoInView ? { opacity: 1, clipPath: 'inset(0 0% 0 0)' } : {}}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, filter: 'blur(10px)', y: 16, scale: 0.95 }}
+            animate={isLogoInView
+              ? { opacity: 1, filter: 'blur(0px)', y: 0, scale: 1 }
+              : { opacity: 0, filter: 'blur(10px)', y: 16, scale: 0.95 }
+            }
+            transition={{
+              duration: 1.0,
+              ease: [0.16, 1, 0.3, 1],
+              opacity: { duration: 0.5, ease: 'easeOut' },
+              filter: { duration: 0.8, ease: 'easeOut' },
+              y: { duration: 0.9, ease: [0.34, 1.56, 0.64, 1] },
+              scale: { duration: 0.9, ease: [0.34, 1.56, 0.64, 1] },
+            }}
           >
             <img src="/footerlogo-aniguess.svg" alt="ANIGUESS°" className="mega-footer-logo-img" />
           </motion.span>
@@ -256,6 +266,11 @@ export function MegaFooter() {
           position: absolute;
           pointer-events: none;
           z-index: 10;
+          width: 14px;
+          height: 14px;
+        }
+        @media (min-width: 641px) {
+          .mega-footer-sparkle { width: 21px; height: 21px; }
         }
         .mega-footer-logo-wrap {
           display: block;
@@ -318,10 +333,10 @@ export function MegaFooter() {
         .mega-footer-tile {
           position: relative;
           z-index: 1;
-          width: 48px;
-          height: 48px;
+          width: 36px;
+          height: 36px;
           flex-shrink: 0;
-          border-radius: 8px;
+          border-radius: 6px;
           cursor: pointer;
           perspective: 400px;
         }
@@ -370,6 +385,7 @@ export function MegaFooter() {
         }
         @media (min-width: 641px) {
           .mega-footer-tagline { font-size: 14px; }
+          .mega-footer-tile { width: 48px; height: 48px; border-radius: 8px; }
         }
         @media (min-width: 768px) {
           .mega-footer { padding: 16px 24px 32px; }
